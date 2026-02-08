@@ -1,0 +1,148 @@
+table BASE
+	lineageTag: 92558807-457e-4329-829e-5b13a3e207b3
+
+	column nom_vendedor
+		dataType: string
+		lineageTag: 18ff41cd-8590-41e4-9f85-90f04af60d30
+		summarizeBy: none
+		sourceColumn: nom_vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column estado
+		dataType: string
+		lineageTag: 271516a8-cfae-48db-b731-519a90d6b470
+		summarizeBy: none
+		sourceColumn: estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column pedido
+		dataType: int64
+		formatString: 0
+		lineageTag: 097a77b4-e468-4e0a-a8d2-c169c52d9606
+		summarizeBy: sum
+		sourceColumn: pedido
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 33a32386-ef3b-4eb8-8e3a-27b1d9ac1239
+		summarizeBy: none
+		sourceColumn: fecha
+
+		variation Variación
+			isDefault
+			relationship: 0b8ea47c-3158-43c2-a91b-5790019f8a7b
+			defaultHierarchy: LocalDateTable_d6d5470e-19a6-409c-8e6e-605446c38c4e.'Jerarquía de fechas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column nit
+		dataType: int64
+		formatString: 0
+		lineageTag: cbef5487-d0d0-44b7-aa33-011d87ebdc8c
+		summarizeBy: sum
+		sourceColumn: nit
+
+		annotation SummarizationSetBy = Automatic
+
+	column cliente
+		dataType: string
+		lineageTag: c9f6120f-7989-47e9-a92a-cb5e91bd3e49
+		summarizeBy: none
+		sourceColumn: cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column ciudad
+		dataType: string
+		lineageTag: 5a1b97c7-2557-40f7-a662-8a9f4ebbe949
+		summarizeBy: none
+		sourceColumn: ciudad
+
+		annotation SummarizationSetBy = Automatic
+
+	column marca
+		dataType: string
+		lineageTag: 7ba0afac-75ab-42ea-bd7c-5b6c4902f5c7
+		summarizeBy: none
+		sourceColumn: marca
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo
+		dataType: string
+		lineageTag: 07a87ffc-6480-4f3e-93d8-09724e397c8d
+		summarizeBy: none
+		sourceColumn: codigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column descripcion
+		dataType: string
+		lineageTag: 360e387e-a400-4821-b12e-eba66757270d
+		summarizeBy: none
+		sourceColumn: descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	column cantidad
+		dataType: int64
+		formatString: 0
+		lineageTag: dd0c7223-0c1e-4fb4-b476-e3f166e6596b
+		summarizeBy: sum
+		sourceColumn: cantidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column subtotal
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 894dc4d5-1c98-4c2f-8e99-f9f2256c0b85
+		summarizeBy: sum
+		sourceColumn: subtotal
+
+		annotation SummarizationSetBy = Automatic
+
+	column nota_adicional
+		dataType: string
+		lineageTag: 475de2c4-1394-4e9f-8c91-379236198c3f
+		summarizeBy: none
+		sourceColumn: nota_adicional
+
+		annotation SummarizationSetBy = Automatic
+
+	column segmentacion
+		dataType: string
+		lineageTag: 1276cb29-3350-4495-8ca0-2673574002e1
+		summarizeBy: none
+		sourceColumn: segmentacion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition BASE = m
+		mode: import
+		source =
+				let
+				    Origen = Excel.Workbook(File.Contents("D:\Github\SalesReport20242025\Data\Ventas Cali 204 -2025.xlsx"), null, true),
+				    Hoja1_Sheet = Origen{[Item="Hoja1",Kind="Sheet"]}[Data],
+				    #"Encabezados promovidos" = Table.PromoteHeaders(Hoja1_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo cambiado" = Table.TransformColumnTypes(#"Encabezados promovidos",{{"nom_vendedor", type text}, {"estado", type text}, {"pedido", Int64.Type}, {"fecha", type date}, {"nit", Int64.Type}, {"cliente", type text}, {"ciudad", type text}, {"marca", type text}, {"codigo", type text}, {"descripcion", type text}, {"cantidad", Int64.Type}, {"subtotal", type number}, {"nota_adicional", type text}, {"segmentacion", type text}}),
+				    #"Texto extraído después del delimitador" = Table.TransformColumns(#"Tipo cambiado", {{"nom_vendedor", each Text.AfterDelimiter(_, " "), type text}}),
+				    #"Texto en mayúsculas" = Table.TransformColumns(#"Texto extraído después del delimitador",{{"ciudad", Text.Upper, type text}, {"estado", Text.Upper, type text}, {"nom_vendedor", Text.Upper, type text}, {"descripcion", Text.Upper, type text}, {"nota_adicional", Text.Upper, type text}}),
+				    #"Tipo cambiado1" = Table.TransformColumnTypes(#"Texto en mayúsculas",{{"subtotal", Currency.Type}}),
+				    #"Filas ordenadas" = Table.Sort(#"Tipo cambiado1",{{"subtotal", Order.Descending}}),
+				    #"Tipo cambiado con configuración regional" = Table.TransformColumnTypes(#"Filas ordenadas", {{"subtotal", type text}}, "en-US"),
+				    #"Tipo cambiado2" = Table.TransformColumnTypes(#"Tipo cambiado con configuración regional",{{"subtotal", Currency.Type}})
+				in
+				    #"Tipo cambiado2"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegación
+

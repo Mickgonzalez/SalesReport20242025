@@ -1,0 +1,106 @@
+table DIM_CIUDAD
+	lineageTag: ba4a44a1-4d68-42a6-aa54-566a59cce9be
+
+	column ciudad_id
+		dataType: string
+		lineageTag: afdf1ebb-d511-4ba9-8474-b85e70ef9c3d
+		summarizeBy: none
+		sourceColumn: ciudad_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column ciudad
+		dataType: string
+		lineageTag: a2263747-7e80-4f7a-a042-cf02cc829452
+		summarizeBy: none
+		sourceColumn: ciudad
+
+		annotation SummarizationSetBy = Automatic
+
+	column departamento
+		dataType: string
+		lineageTag: 02e07aad-9996-4544-87c0-a7d9909fc764
+		summarizeBy: none
+		sourceColumn: departamento
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_CIUDAD = m
+		mode: import
+		source = ```
+				let
+				    Origen = BASE,
+				    
+				    // Función para normalizar ciudad (la misma que en FACT_Ventas)
+				    normalizarCiudad = (ciudadOriginal) =>
+				        let
+				            // Convertir a mayúsculas y quitar espacios al inicio y final
+				            ciudadUpper = Text.Upper(Text.Trim(ciudadOriginal)),
+				            // Reemplazar múltiples espacios por uno solo
+				            partes = Text.Split(ciudadUpper, " "),
+				            partesNoVacias = List.Select(partes, each _ <> ""),
+				            ciudadUnEspacio = Text.Combine(partesNoVacias, " "),
+				            // Quitar caracteres especiales (guiones bajos, puntos, etc.)
+				            sinEspeciales = Text.Remove(ciudadUnEspacio, {"_", ".", ",", ";", ":", "!", "?"}),
+				            // Normalizar acentos
+				            sinAcentos = Text.Replace(
+				                Text.Replace(
+				                    Text.Replace(
+				                        Text.Replace(
+				                            Text.Replace(sinEspeciales, "Á", "A"), 
+				                        "É", "E"), 
+				                    "Í", "I"), 
+				                "Ó", "O"), 
+				            "Ú", "U")
+				        in
+				            sinAcentos,
+				
+				    // Aplicar normalización
+				    CiudadNormalizada = Table.AddColumn(Origen, "ciudad_normalizada", each normalizarCiudad([ciudad])),
+				    
+				    // Crear ID de ciudad a partir del nombre normalizado, reemplazando espacios por guiones bajos
+				    CiudadID = Table.AddColumn(CiudadNormalizada, "ciudad_id", each Text.Replace([ciudad_normalizada], " ", "_")),
+				    
+				    // Seleccionar y crear dimensión
+				    Seleccionar = Table.SelectColumns(CiudadID, {"ciudad_id", "ciudad_normalizada"}),
+				    Unicos = Table.Distinct(Seleccionar, {"ciudad_id"}),
+				    
+				    // Agregar más atributos geográficos si los tienes (opcional)
+				    Atributos = Table.AddColumn(Unicos, "departamento", each
+				        // Puedes mapear ciudades a departamentos
+				        if Text.Contains([ciudad_normalizada], "CALI") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "BOGOTA") then "CUNDINAMARCA"
+				        else if Text.Contains([ciudad_normalizada], "TULUA") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "BUGA") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "BUGALAGRANDE") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "CALOTO") then "CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "CANDELARIA") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "ENVIGADO") then "ANTIOQUIA"
+				        else if Text.Contains([ciudad_normalizada], "GUACARI") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "GUADALAJARA DE BUGA") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "JAMUNDI") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "MIRANDA") then "CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "ORITO") then "PUTUMAYO"
+				        else if Text.Contains([ciudad_normalizada], "PALMIRA") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "PASTO") then "NARIÑO"
+				        else if Text.Contains([ciudad_normalizada], "POPAYAN") then "CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "SABANETA") then "ANTIOQUIA"
+				        else if Text.Contains([ciudad_normalizada], "SANTANDER DE QUILICHAO") then "CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "TULUA") then "CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "VILLA RICA") then "CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "YUMBO") then "VALLE DEL CAUCA"
+				        else if Text.Contains([ciudad_normalizada], "VILLA MELLA") then "REPUBLICA DOMINICANA"
+				        else "Por definir"
+				    ),
+				    
+				    Ordenar = Table.Sort(Atributos, {{"ciudad_normalizada", Order.Ascending}}),
+				    // Renombrar columna para que sea más clara
+				    Renombrar = Table.RenameColumns(Ordenar, {{"ciudad_normalizada", "ciudad"}})
+				in
+				    Renombrar
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

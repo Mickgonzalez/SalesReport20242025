@@ -1,0 +1,47 @@
+table DIM_PRODUCTO
+	lineageTag: aa4fafe2-b40d-4568-8470-5bc4ba29cf96
+
+	column codigo
+		dataType: string
+		lineageTag: 4a11606f-9e3a-4cf9-8434-ee047375af8c
+		summarizeBy: none
+		sourceColumn: codigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column descripcion
+		dataType: string
+		lineageTag: bcec7bbc-13ee-4170-8be0-1637633f1995
+		summarizeBy: none
+		sourceColumn: descripcion
+
+		annotation SummarizationSetBy = Automatic
+
+	column marca
+		dataType: string
+		lineageTag: eb97fd57-1310-4fe9-b305-09c49e39575a
+		summarizeBy: none
+		sourceColumn: marca
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_PRODUCTO = m
+		mode: import
+		source =
+				let
+				    Origen = BASE,
+				    // Seleccionar columnas de producto
+				    Seleccionar = Table.SelectColumns(Origen,{"codigo", "descripcion", "marca"}),
+				    // Eliminar duplicados (usar codigo como único)
+				    Unicos = Table.Distinct(Seleccionar, {"codigo"}),
+				    // Limpiar descripciones (opcional)
+				    DescripcionLimpia = Table.TransformColumns(Unicos, {
+				        {"descripcion", each Text.Trim(_), type text}
+				    })
+				in
+				    DescripcionLimpia
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

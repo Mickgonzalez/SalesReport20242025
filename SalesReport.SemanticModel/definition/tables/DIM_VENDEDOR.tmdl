@@ -1,0 +1,42 @@
+table DIM_VENDEDOR
+	lineageTag: abe2d4bd-e439-49b6-b333-4ab09eaecaf3
+
+	column codigo_vendedor
+		dataType: string
+		lineageTag: cfb9aee2-6521-4aa9-ab75-3b3ba329bad0
+		summarizeBy: none
+		sourceColumn: codigo_vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column nom_vendedor
+		dataType: string
+		lineageTag: daa04983-57cd-4e22-a181-ae82675001ac
+		summarizeBy: none
+		sourceColumn: nom_vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_VENDEDOR = m
+		mode: import
+		source = ```
+				// Desde la tabla principal
+				let
+				    Origen = BASE,  // Tu tabla original
+				    // Seleccionar y renombrar columnas
+				    SeleccionarColumnas = Table.SelectColumns(Origen,{"nom_vendedor"}),
+				    // Eliminar duplicados
+				    EliminarDuplicados = Table.Distinct(SeleccionarColumnas),
+				    // Extraer código del vendedor
+				    CodigoVendedor = Table.AddColumn(EliminarDuplicados, "codigo_vendedor", each 
+				        Text.Trim(Text.Start([nom_vendedor], 3))),
+				    // Reordenar columnas
+				    Reordenar = Table.ReorderColumns(CodigoVendedor,{"codigo_vendedor", "nom_vendedor"})
+				in
+				    Reordenar
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

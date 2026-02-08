@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "8212a390d1f4f8233148",
+  "position": {
+    "x": 16,
+    "y": 866,
+    "z": 8000,
+    "height": 315,
+    "width": 566,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASE"
+                    }
+                  },
+                  "Property": "Sales Trend HTML2"
+                }
+              },
+              "queryRef": "MEDIDAS BASE.Sales Trend HTML2",
+              "nativeQueryRef": "Sales Trend HTML2"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

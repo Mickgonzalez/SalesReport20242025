@@ -1,0 +1,58 @@
+table DIM_SEGMENTACION
+	lineageTag: b5c8c28d-c993-4637-899e-7436e9e802e1
+
+	column nombre_segmentacion
+		dataType: string
+		lineageTag: 23c9cf4a-cc1c-4f7b-9f2a-f40bcb47deca
+		summarizeBy: none
+		sourceColumn: nombre_segmentacion
+
+		annotation SummarizationSetBy = Automatic
+
+	column id_segmentacion
+		dataType: int64
+		formatString: 0
+		lineageTag: a1f501ef-fa9d-4682-9385-9b64d80711c7
+		summarizeBy: none
+		sourceColumn: id_segmentacion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_SEGMENTACION = m
+		mode: import
+		source = ```
+				// DIM_SEGMENTACION
+				let
+				    Origen = BASE,
+				    // Seleccionar columna segmentacion
+				    Segmentaciones = Table.SelectColumns(Origen, {"segmentacion"}),
+				    // Limpiar y normalizar
+				    Limpieza = Table.TransformColumns(Segmentaciones, {
+				        {"segmentacion", each Text.Trim(Text.Upper(_)), type text}
+				    }),
+				    // Consolidar variaciones (por ejemplo, ALIMENTOS)
+				    Consolidado = Table.TransformColumns(Limpieza, {
+				        {"segmentacion", each 
+				            if Text.Contains(_, "ALIMENT") then "ALIMENTOS"
+				            else if Text.Contains(_, "METAL") then "METALES"
+				            else if Text.Contains(_, "FARMAC") then "FARMACEUTICA"
+				            else if Text.Contains(_, "COMERCIO") then "COMERCIO"
+				            else _
+				        }
+				    }),
+				    // Eliminar duplicados
+				    Unicos = Table.Distinct(Consolidado, {"segmentacion"}),
+				    // Ordenar
+				    Ordenado = Table.Sort(Unicos, {{"segmentacion", Order.Ascending}}),
+				    // Agregar ID
+				    ConID = Table.AddIndexColumn(Ordenado, "id_segmentacion", 1, 1, Int64.Type),
+				    // Renombrar
+				    Renombrado = Table.RenameColumns(ConID, {{"segmentacion", "nombre_segmentacion"}})
+				in
+				    Renombrado
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,890 @@
+table 'MEDIDAS BASE'
+	lineageTag: 32b38dba-23d4-4699-91ea-ee13ec174f5b
+
+	measure 'Ventas Totales' = SUM(FACT_VENTAS[subtotal])
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: be9b2fa0-36ad-4550-a11b-ef50cbe604f8
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Cantidad Total' = SUM(FACT_VENTAS[cantidad])
+		formatString: 0
+		lineageTag: 63ded7ac-1767-446b-8c27-983448ecc602
+
+	measure 'Pedidos Únicos' = DISTINCTCOUNT(FACT_VENTAS[Pedido])
+		formatString: 0
+		lineageTag: c3d647ed-d3b4-43ee-bad7-1439cb754a61
+
+	measure 'Clientes Únicos' =
+			
+			DISTINCTCOUNT(DIM_CLIENTE[nit])
+		formatString: 0
+		lineageTag: 4c0d37de-8bc2-4490-b7d8-c51ce4958913
+
+	measure 'Productos Únicos' =
+			
+			DISTINCTCOUNT(DIM_PRODUCTO[codigo])
+		formatString: 0
+		lineageTag: 2fc5d42f-a9c5-4835-8ef0-913040f9c7a0
+
+	measure 'Ventas por Año' =
+			
+			CALCULATE(
+			    [Ventas Totales],
+			    ALLEXCEPT(DIM_TIEMPO, DIM_TIEMPO[año])
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: b1e661c0-fea7-48b2-932c-64e919f9b500
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Ventas 2025' =
+			
+			CALCULATE(
+			    SUM(FACT_VENTAS[subtotal]),
+			    YEAR(FACT_VENTAS[fecha]) = 2025
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: fe2910fc-fb99-4c1b-87c4-d2d319a23b00
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Ventas 2024' =
+			
+			CALCULATE(
+			    SUM(FACT_VENTAS[subtotal]),
+			    YEAR(FACT_VENTAS[fecha]) = 2024
+			)
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: fd434735-ff54-44de-93ab-c021d75423cf
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'HTML CARD' = ```
+			
+			VAR RevenueFmt = FORMAT([Ventas Totales], "$#,##0")
+			VAR OrdersFmt  = FORMAT([Cantidad Total], "#,##0")
+			VAR ClientsFmt = FORMAT([Clientes Únicos], "#,##0")
+			
+			VAR V2024Val = [Ventas 2024]
+			VAR V2025Val = [Ventas 2025]
+			
+			VAR V2024Fmt = FORMAT(V2024Val, "$#,##0,,.0") & "M"
+			VAR V2025Fmt = FORMAT(V2025Val, "$#,##0,,.0") & "M"
+			
+			VAR VarVal = V2025Val - V2024Val
+			VAR VarFmt = FORMAT(VarVal, "$#,##0,,.0") & "M"
+			VAR VarPctVal = DIVIDE(VarVal, V2024Val)
+			VAR VarPct = FORMAT(VarPctVal, "0.0%")
+			
+			VAR ColorVar =
+			IF(VarPctVal >= 0, "#4dfed8", "#ff4d6d")
+			
+			VAR BarraPct =
+			MIN(ABS(VarPctVal), 1)
+			
+			RETURN
+			"
+			<style>
+			.kpi-card {
+			    max-width: 520px;
+			    min-width: 360px;
+			    height: 320px; /* <--- Añade esto */
+			    background: #0d121a;
+			    border-radius: 18px;
+			    padding: 20px;
+			    color: #ffffff;
+			    font-family: 'Segoe UI', sans-serif;
+			    box-shadow: 0 0 40px rgba(77,254,216,0.15);
+			    border: 1px solid rgba(77,254,216,0.25);
+			}
+			
+			.kpi-title {
+			    font-size: 13px;
+			    color: #a0b3c6;
+			    text-transform: uppercase;
+			    letter-spacing: 1px;
+			}
+			
+			.kpi-revenue {
+			    font-size: 34px;
+			    font-weight: 700;
+			    margin-top: 6px;
+			}
+			
+			.divider {
+			    margin: 14px 0;
+			    height: 1px;
+			    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+			}
+			
+			.kpi-grid {
+			    display: grid;
+			    grid-template-columns: 1fr 1fr;
+			    gap: 14px;
+			}
+			
+			.kpi-item {
+			    font-size: 12px;
+			    color: #9fb1c4;
+			}
+			
+			.kpi-item span {
+			    display: block;
+			    font-size: 18px;
+			    font-weight: 600;
+			    color: #ffffff;
+			}
+			
+			.change-grid {
+			    display: grid;
+			    grid-template-columns: 1fr 1fr;
+			    gap: 14px;
+			    margin-top: 6px;
+			}
+			
+			.year-box {
+			    background: rgba(255,255,255,0.05);
+			    border-radius: 12px;
+			    padding: 10px;
+			    text-align: center;
+			}
+			
+			.year-label {
+			    font-size: 11px;
+			    color: #8fa3b8;
+			    text-transform: uppercase;
+			}
+			
+			.year-value {
+			    font-size: 16px;
+			    font-weight: 600;
+			}
+			
+			.kpi-var {
+			    margin-top: 10px;
+			    font-size: 14px;
+			    color: " & ColorVar & ";
+			}
+			
+			.progress {
+			    margin-top: 6px;
+			    height: 8px;
+			    border-radius: 8px;
+			    background: rgba(255,255,255,0.08);
+			    overflow: hidden;
+			}
+			
+			.progress-bar {
+			    height: 100%;
+			    width: " & FORMAT(BarraPct * 100, "0") & "%;
+			    background: linear-gradient(90deg, #4dfed8, #67a8ff);
+			}
+			</style>
+			
+			<div class='kpi-card'>
+			    <div class='kpi-title'>Sales Performance</div>
+			    <div class='kpi-revenue'>" & RevenueFmt & "</div>
+			
+			    <div class='divider'></div>
+			
+			    <div class='kpi-grid'>
+			        <div class='kpi-item'>Total Orders<span>" & OrdersFmt & "</span></div>
+			        <div class='kpi-item'>Total Clients<span>" & ClientsFmt & "</span></div>
+			    </div>
+			
+			    <div class='divider'></div>
+			
+			    <div class='change-grid'>
+			        <div class='year-box'>
+			            <div class='year-label'>2024</div>
+			            <div class='year-value'>" & V2024Fmt & "</div>
+			        </div>
+			        <div class='year-box'>
+			            <div class='year-label'>2025</div>
+			            <div class='year-value'>" & V2025Fmt & "</div>
+			        </div>
+			    </div>
+			
+			    <div class='kpi-var'>
+			        YoY Change: " & VarFmt & " (" & VarPct & ")
+			    </div>
+			
+			    <div class='progress'>
+			        <div class='progress-bar'></div>
+			    </div>
+			</div>
+			"
+			
+			```
+		lineageTag: 0077f97d-e73c-4518-a62d-e193ad3a056b
+
+	measure 'Variación % Ventas' =
+			
+			VAR VentasActual = [Ventas 2025]
+			VAR VentasPrevio = [Ventas 2024]
+			RETURN
+			DIVIDE(
+			    VentasActual - VentasPrevio,
+			    VentasPrevio,
+			    0
+			)
+		lineageTag: 5eb7f7b2-8a5c-4a73-a704-487fbf3bf1d1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'HTML Tabla Clientes' = ```
+			
+			VAR Tabla =
+			ADDCOLUMNS(
+			    SUMMARIZE(
+			        DIM_CLIENTE,
+			        DIM_CLIENTE[Cliente]
+			    ),
+			    "V2024", [Ventas 2024],
+			    "V2025", [Ventas 2025],
+			    "VTOTAL", [Ventas Totales],
+			    "PCT", [Variación % Ventas]
+			)
+			
+			RETURN
+			"
+			<style>
+			
+			/* ===== CONTENEDOR GENERAL ===== */
+			.html-wrapper {
+			    background: #0d121a;
+			    padding: 18px;
+			    border-radius: 16px;
+			    width: 100%;
+			    box-sizing: border-box;
+			    font-family: 'Segoe UI', sans-serif;
+			}
+			
+			/* ===== TABLA ===== */
+			.exec-table {
+			    width: 100%;
+			    border-collapse: collapse;
+			    color: #ffffff;
+			}
+			
+			.exec-table th {
+			    font-size: 11px;
+			    text-transform: uppercase;
+			    letter-spacing: 0.8px;
+			    color: #8fa3b8;
+			    text-align: left;
+			    padding: 8px 6px;
+			
+			    position: sticky;
+			    top: 0;
+			    z-index: 2;
+			
+			    background: #0d121a;
+			    border-bottom: 1px solid rgba(255,255,255,0.25);
+			}
+			
+			
+			
+			.exec-table td {
+			    padding: 8px 6px;
+			    font-size: 13px;
+			    border-bottom: 1px solid rgba(255,255,255,0.06);
+			    vertical-align: middle;
+			}
+			
+			/* ===== NUMEROS ===== */
+			.num {
+			    text-align: right;
+			    white-space: nowrap;
+			}
+			
+			.total {
+			    font-weight: 600;
+			    color: #4dfed8;
+			}
+			
+			/* ===== YOY BAR ===== */
+			.yoy {
+			    font-size: 12px;
+			    margin-bottom: 4px;
+			}
+			
+			.bar-wrap {
+			    background: rgba(255,255,255,0.08);
+			    border-radius: 6px;
+			    height: 8px;
+			    overflow: hidden;
+			}
+			
+			.bar {
+			    height: 100%;
+			    background: linear-gradient(90deg, #4dfed8, #67a8ff);
+			}
+			
+			/* ===== HOVER ===== */
+			.exec-table tr:hover td {
+			    background: rgba(255,255,255,0.03);
+			}
+			
+			</style>
+			
+			<div class='html-wrapper'>
+			<table class='exec-table'>
+			<tr>
+			    <th>Client</th>
+			    <th class='num'>Sales 2024</th>
+			    <th class='num'>Sales 2025</th>
+			    <th class='num'>Total Sales</th>
+			    <th>YoY %</th>
+			</tr>
+			"
+			&
+			CONCATENATEX(
+			    Tabla,
+			    "
+			    <tr>
+			        <td>" & DIM_CLIENTE[Cliente] & "</td>
+			        <td class='num'>" & FORMAT([V2024], "$#,##0") & "</td>
+			        <td class='num'>" & FORMAT([V2025], "$#,##0") & "</td>
+			        <td class='num total'>" & FORMAT([VTOTAL], "$#,##0") & "</td>
+			        <td>
+			            <div class='yoy'>" & FORMAT([PCT], "0.00%") & "</div>
+			            <div class='bar-wrap'>
+			                <div class='bar' style='width:" & FORMAT(MIN(ABS([PCT]),1)*100,"0") & "%'></div>
+			            </div>
+			        </td>
+			    </tr>
+			    ",
+			    "",
+			    [VTOTAL],
+			    DESC
+			)
+			&
+			"</table>
+			</div>"
+			
+			```
+		lineageTag: 63e7fa67-a7ed-44b2-b589-a059ed9137af
+
+	measure 'HTML Tabla Marca' = ```
+			
+			VAR Tabla =
+			ADDCOLUMNS(
+			    SUMMARIZE(
+			        DIM_PRODUCTO,
+			        DIM_PRODUCTO[marca]
+			    ),
+			    "V2024", [Ventas 2024],
+			    "V2025", [Ventas 2025],
+			    "VTOTAL", [Ventas Totales],
+			    "PCT", [Variación % Ventas]
+			)
+			
+			RETURN
+			"
+			<style>
+			
+			/* ===== CONTENEDOR GENERAL ===== */
+			.html-wrapper {
+			    background: #0d121a;
+			    padding: 18px;
+			    border-radius: 16px;
+			    width: 100%;
+			    box-sizing: border-box;
+			    font-family: 'Segoe UI', sans-serif;
+			}
+			
+			/* ===== TABLA ===== */
+			.exec-table {
+			    width: 100%;
+			    border-collapse: collapse;
+			    color: #ffffff;
+			}
+			
+			.exec-table th {
+			    font-size: 11px;
+			    text-transform: uppercase;
+			    letter-spacing: 0.8px;
+			    color: #8fa3b8;
+			    text-align: left;
+			    padding: 8px 6px;
+			
+			    position: sticky;
+			    top: 0;
+			    z-index: 2;
+			
+			    background: #0d121a;
+			    border-bottom: 1px solid rgba(255,255,255,0.25);
+			}
+			
+			
+			
+			.exec-table td {
+			    padding: 8px 6px;
+			    font-size: 13px;
+			    border-bottom: 1px solid rgba(255,255,255,0.06);
+			    vertical-align: middle;
+			}
+			
+			/* ===== NUMEROS ===== */
+			.num {
+			    text-align: right;
+			    white-space: nowrap;
+			}
+			
+			.total {
+			    font-weight: 600;
+			    color: #4dfed8;
+			}
+			
+			/* ===== YOY BAR ===== */
+			.yoy {
+			    font-size: 12px;
+			    margin-bottom: 4px;
+			}
+			
+			.bar-wrap {
+			    background: rgba(255,255,255,0.08);
+			    border-radius: 6px;
+			    height: 8px;
+			    overflow: hidden;
+			}
+			
+			.bar {
+			    height: 100%;
+			    background: linear-gradient(90deg, #4dfed8, #67a8ff);
+			}
+			
+			/* ===== HOVER ===== */
+			.exec-table tr:hover td {
+			    background: rgba(255,255,255,0.03);
+			}
+			
+			</style>
+			
+			<div class='html-wrapper'>
+			<table class='exec-table'>
+			<tr>
+			    <th>Brand</th>
+			    <th class='num'>Sales 2024</th>
+			    <th class='num'>Sales 2025</th>
+			    <th class='num'>Total Sales</th>
+			    <th>YoY %</th>
+			</tr>
+			"
+			&
+			CONCATENATEX(
+			    Tabla,
+			    "
+			    <tr>
+			        <td>" & DIM_PRODUCTO[marca] & "</td>
+			        <td class='num'>" & FORMAT([V2024], "$#,##0") & "</td>
+			        <td class='num'>" & FORMAT([V2025], "$#,##0") & "</td>
+			        <td class='num total'>" & FORMAT([VTOTAL], "$#,##0") & "</td>
+			        <td>
+			            <div class='yoy'>" & FORMAT([PCT], "0.00%") & "</div>
+			            <div class='bar-wrap'>
+			                <div class='bar' style='width:" & FORMAT(MIN(ABS([PCT]),1)*100,"0") & "%'></div>
+			            </div>
+			        </td>
+			    </tr>
+			    ",
+			    "",
+			    [VTOTAL],
+			    DESC
+			)
+			&
+			"</table>
+			</div>"
+			
+			```
+		lineageTag: bbc78aa4-2dee-455a-b9fb-fa8a35fc2e04
+
+	measure 'Gauge Sales HTML' = ```
+			
+			VAR Ventas = [Ventas Totales]
+			VAR Target = 3000000000
+			VAR Maximo = 4000000000
+			
+			VAR Porcentaje = DIVIDE(Ventas, Maximo, 0)
+			-- El 251.3 es el cálculo del perímetro del semicírculo (PI * Radio)
+			VAR DashArray = (MIN(Porcentaje, 1) * 251.3)
+			
+			VAR VentasFmt = FORMAT(Ventas, "$#,##0,,.0") & "B"
+			VAR TargetFmt = FORMAT(Target, "$#,##0,,.0") & "B"
+			
+			RETURN
+			"
+			<style>
+			    .gauge-container {
+			        width: 100%;
+			        max-width: 520px;
+			        height: 320px; /* Igualamos el alto */
+			        background: #0d121a;
+			        border-radius: 18px;
+			        padding: 20px;
+			        color: #ffffff;
+			        font-family: 'Segoe UI', sans-serif;
+			        border: 1px solid rgba(77,254,216,0.25);
+			        box-shadow: 0 0 40px rgba(77,254,216,0.15);
+			        display: flex;
+			        flex-direction: column;
+			        justify-content: space-between;
+			        box-sizing: border-box;
+			    }
+			    .label-title { font-size: 13px; color: #a0b3c6; text-transform: uppercase; letter-spacing: 1px; }
+			    .main-value { font-size: 34px; font-weight: 700; margin-top: 5px; }
+			</style>
+			
+			<div class='gauge-container'>
+			    <div>
+			        <div class='label-title'>Sales Goal Performance</div>
+			        <div class='main-value'>" & VentasFmt & "</div>
+			    </div>
+			    
+			    <svg viewBox='0 0 200 120' width='100%'>
+			        <defs>
+			            <linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='0%'>
+			                <stop offset='0%' style='stop-color:#4dfed8;stop-opacity:1' />
+			                <stop offset='100%' style='stop-color:#67a8ff;stop-opacity:1' />
+			            </linearGradient>
+			        </defs>
+			
+			        <path d='M 20 100 A 80 80 0 0 1 180 100' fill='none' stroke='rgba(255,255,255,0.08)' stroke-width='18' stroke-linecap='round'/>
+			        
+			        <path d='M 20 100 A 80 80 0 0 1 180 100' fill='none' stroke='url(#grad)' stroke-width='18' stroke-linecap='round' 
+			              stroke-dasharray='" & DashArray & " 251.3' />
+			
+			        <line x1='100' y1='15' x2='100' y2='35' 
+			              transform='rotate(" & ((Target/Maximo * 180) - 90) & ", 100, 100)' 
+			              style='stroke:#ffffff; stroke-width:3; stroke-linecap:round;' />
+			        
+			        <text x='100' y='95' fill='#ffffff' font-size='9' text-anchor='middle' font-weight='600'>TARGET: " & TargetFmt & "</text>
+			    </svg>
+			
+			    <div style='font-size: 11px; color: #8fa3b8; text-align: center;'>
+			        Max Scale: $4.0B
+			    </div>
+			</div>
+			"
+			```
+		lineageTag: 57bcddff-4308-4a46-ad9b-24815310bc35
+
+	measure 'Sales Trend HTML' = ```
+			
+			-- ===============================
+			-- 1. QUARTERLY VALUES
+			-- ===============================
+			VAR V24_Q1 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 1")
+			    )
+			VAR V24_Q2 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 2")
+			    )
+			VAR V24_Q3 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 3")
+			    )
+			VAR V24_Q4 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 4")
+			    )
+			
+			VAR V25_Q1 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 1")
+			    )
+			VAR V25_Q2 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 2")
+			    )
+			VAR V25_Q3 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 3")
+			    )
+			VAR V25_Q4 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 4")
+			    )
+			
+			-- ===============================
+			-- 2. MAX SCALE
+			-- ===============================
+			VAR MaxSales =
+			    MAXX(
+			        {
+			            V24_Q1, V24_Q2, V24_Q3, V24_Q4,
+			            V25_Q1, V25_Q2, V25_Q3, V25_Q4
+			        },
+			        [Value]
+			    ) * 1.15
+			
+			VAR MaxSafe = IF(ISBLANK(MaxSales) || MaxSales = 0, 1, MaxSales)
+			
+			-- ===============================
+			-- 3. SVG Y POSITIONS
+			-- ===============================
+			VAR Y24_Q1 = 150 - DIVIDE(V24_Q1, MaxSafe) * 150
+			VAR Y24_Q2 = 150 - DIVIDE(V24_Q2, MaxSafe) * 150
+			VAR Y24_Q3 = 150 - DIVIDE(V24_Q3, MaxSafe) * 150
+			VAR Y24_Q4 = 150 - DIVIDE(V24_Q4, MaxSafe) * 150
+			
+			VAR Y25_Q1 = 150 - DIVIDE(V25_Q1, MaxSafe) * 150
+			VAR Y25_Q2 = 150 - DIVIDE(V25_Q2, MaxSafe) * 150
+			VAR Y25_Q3 = 150 - DIVIDE(V25_Q3, MaxSafe) * 150
+			VAR Y25_Q4 = 150 - DIVIDE(V25_Q4, MaxSafe) * 150
+			
+			-- ===============================
+			-- 4. HTML + SVG
+			-- ===============================
+			RETURN
+			"
+			<div style='
+			    width:100%;
+			    max-width:520px;
+			    height:320px;
+			    background:#0d121a;
+			    border-radius:22px;
+			    padding:24px;
+			    box-sizing:border-box;
+			    font-family:Segoe UI, sans-serif;
+			    color:#ffffff;
+			    border:1px solid rgba(77,254,216,0.18);
+			    box-shadow:0 10px 30px rgba(0,0,0,0.45);
+			'>
+			
+			    <!-- HEADER -->
+			    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:18px'>
+			        <div style='font-size:13px;color:#9fb2c7;text-transform:uppercase;letter-spacing:1.4px;font-weight:600'>
+			            Annual Sales (YoY)
+			        </div>
+			        <div style='font-size:11px;display:flex;gap:14px'>
+			            <span><span style='color:#5b8fd9;font-size:14px'>●</span> 2024</span>
+			            <span><span style='color:#4ec9e0;font-size:14px'>●</span> 2025</span>
+			        </div>
+			    </div>
+			
+			    <!-- CHART -->
+			    <svg viewBox='0 0 400 150' preserveAspectRatio='none' style='width:100%;height:170px'>
+			
+			        <defs>
+			            <linearGradient id='g24' x1='0' y1='0' x2='0' y2='1'>
+			                <stop offset='0%' stop-color='#5b8fd9' stop-opacity='0.22'/>
+			                <stop offset='100%' stop-color='#5b8fd9' stop-opacity='0'/>
+			            </linearGradient>
+			            <linearGradient id='g25' x1='0' y1='0' x2='0' y2='1'>
+			                <stop offset='0%' stop-color='#4ec9e0' stop-opacity='0.25'/>
+			                <stop offset='100%' stop-color='#4ec9e0' stop-opacity='0'/>
+			            </linearGradient>
+			        </defs>
+			
+			        <!-- GRID -->
+			        <line x1='0' y1='37.5' x2='400' y2='37.5' stroke='rgba(255,255,255,0.04)'/>
+			        <line x1='0' y1='75' x2='400' y2='75' stroke='rgba(255,255,255,0.04)'/>
+			        <line x1='0' y1='112.5' x2='400' y2='112.5' stroke='rgba(255,255,255,0.04)'/>
+			        <line x1='0' y1='150' x2='400' y2='150' stroke='rgba(255,255,255,0.06)'/>
+			
+			        <!-- 2024 AREA -->
+			        <path d='M 0,150
+			                 L 0," & FORMAT(Y24_Q1,"0.00","en-US") & "
+			                 L 133," & FORMAT(Y24_Q2,"0.00","en-US") & "
+			                 L 266," & FORMAT(Y24_Q3,"0.00","en-US") & "
+			                 L 400," & FORMAT(Y24_Q4,"0.00","en-US") & "
+			                 L 400,150 Z'
+			              fill='url(#g24)' />
+			
+			        <!-- 2024 LINE -->
+			        <path d='M 0," & FORMAT(Y24_Q1,"0.00","en-US") &
+			                 " L 133," & FORMAT(Y24_Q2,"0.00","en-US") &
+			                 " L 266," & FORMAT(Y24_Q3,"0.00","en-US") &
+			                 " L 400," & FORMAT(Y24_Q4,"0.00","en-US") & "'
+			              fill='none'
+			              stroke='#5b8fd9'
+			              stroke-width='2.6'
+			              stroke-linecap='round'
+			              stroke-linejoin='round'/>
+			
+			        <!-- 2025 AREA -->
+			        <path d='M 0,150
+			                 L 0," & FORMAT(Y25_Q1,"0.00","en-US") & "
+			                 L 133," & FORMAT(Y25_Q2,"0.00","en-US") & "
+			                 L 266," & FORMAT(Y25_Q3,"0.00","en-US") & "
+			                 L 400," & FORMAT(Y25_Q4,"0.00","en-US") & "
+			                 L 400,150 Z'
+			              fill='url(#g25)' />
+			
+			        <!-- 2025 LINE -->
+			        <path d='M 0," & FORMAT(Y25_Q1,"0.00","en-US") &
+			                 " L 133," & FORMAT(Y25_Q2,"0.00","en-US") &
+			                 " L 266," & FORMAT(Y25_Q3,"0.00","en-US") &
+			                 " L 400," & FORMAT(Y25_Q4,"0.00","en-US") & "'
+			              fill='none'
+			              stroke='#4ec9e0'
+			              stroke-width='2.6'
+			              stroke-linecap='round'
+			              stroke-linejoin='round'/>
+			
+			    </svg>
+			
+			    <!-- FOOTER -->
+			    <div style='display:flex;justify-content:space-between;margin-top:14px;font-size:10px;color:#8fa3b8;font-weight:700;letter-spacing:1px'>
+			        <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
+			    </div>
+			</div>
+			"
+			
+			```
+		lineageTag: 6d738496-2cd1-4f27-a2ee-3ef0e74ee36f
+
+	measure 'Sales Trend HTML2' = ```
+			
+			-- ===============================
+			-- 1. QUARTERLY VALUES
+			-- ===============================
+			VAR V24_Q1 = CALCULATE([Ventas 2024], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 1"))
+			VAR V24_Q2 = CALCULATE([Ventas 2024], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 2"))
+			VAR V24_Q3 = CALCULATE([Ventas 2024], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 3"))
+			VAR V24_Q4 = CALCULATE([Ventas 2024], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 4"))
+			
+			VAR V25_Q1 = CALCULATE([Ventas 2025], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 1"))
+			VAR V25_Q2 = CALCULATE([Ventas 2025], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 2"))
+			VAR V25_Q3 = CALCULATE([Ventas 2025], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 3"))
+			VAR V25_Q4 = CALCULATE([Ventas 2025], FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 4"))
+			
+			-- ===============================
+			-- 2. SCALE
+			-- ===============================
+			VAR MaxSales =
+			    MAXX(
+			        {
+			            V24_Q1, V24_Q2, V24_Q3, V24_Q4,
+			            V25_Q1, V25_Q2, V25_Q3, V25_Q4
+			        },
+			        [Value]
+			    ) * 1.15
+			
+			VAR MaxSafe = IF(MaxSales = 0 || ISBLANK(MaxSales), 1, MaxSales)
+			
+			-- Y axis values
+			VAR Y100 = MaxSafe
+			VAR Y75  = MaxSafe * 0.75
+			VAR Y50  = MaxSafe * 0.5
+			VAR Y25  = MaxSafe * 0.25
+			
+			-- ===============================
+			-- 3. SVG POSITIONS
+			-- ===============================
+			VAR Y24_Q1 = 150 - DIVIDE(V24_Q1, MaxSafe) * 150
+			VAR Y24_Q2 = 150 - DIVIDE(V24_Q2, MaxSafe) * 150
+			VAR Y24_Q3 = 150 - DIVIDE(V24_Q3, MaxSafe) * 150
+			VAR Y24_Q4 = 150 - DIVIDE(V24_Q4, MaxSafe) * 150
+			
+			VAR Y25_Q1 = 150 - DIVIDE(V25_Q1, MaxSafe) * 150
+			VAR Y25_Q2 = 150 - DIVIDE(V25_Q2, MaxSafe) * 150
+			VAR Y25_Q3 = 150 - DIVIDE(V25_Q3, MaxSafe) * 150
+			VAR Y25_Q4 = 150 - DIVIDE(V25_Q4, MaxSafe) * 150
+			
+			-- ===============================
+			-- 4. FORMAT Y LABELS
+			-- ===============================
+			VAR F100 = FORMAT(Y100, "$#,0,,.##M", "en-US")
+			VAR F75  = FORMAT(Y75,  "$#,0,,.##M", "en-US")
+			VAR F50  = FORMAT(Y50,  "$#,0,,.##M", "en-US")
+			VAR F25  = FORMAT(Y25,  "$#,0,,.##M", "en-US")
+			
+			RETURN
+			"
+			<div style='
+			    width:100%;
+			    max-width:540px;
+			    height:300px;
+			    background:#0d121a;
+			    border-radius:22px;
+			    padding:22px;
+			    box-sizing:border-box;
+			    font-family:Segoe UI, sans-serif;
+			    color:#ffffff;
+			'>
+			
+			<div style='display:flex;justify-content:space-between;margin-bottom:16px'>
+			    <div style='font-size:13px;color:#9fb2c7;text-transform:uppercase;letter-spacing:1.4px;font-weight:600'>
+			        Annual Sales (YoY)
+			    </div>
+			    <div style='font-size:11px;display:flex;gap:14px'>
+			        <span><span style='color:#5b8fd9'>●</span> 2024</span>
+			        <span><span style='color:#4ec9e0'>●</span> 2025</span>
+			    </div>
+			</div>
+			
+			<div style='display:flex'>
+			
+			<!-- Y AXIS -->
+			<div style='width:50px;font-size:10px;color:#8fa3b8;display:flex;flex-direction:column;justify-content:space-between;padding-right:6px'>
+			    <span>" & F100 & "</span>
+			    <span>" & F75 & "</span>
+			    <span>" & F50 & "</span>
+			    <span>" & F25 & "</span>
+			</div>
+			
+			<!-- CHART -->
+			<svg viewBox='0 0 400 150' preserveAspectRatio='none' style='flex:1;height:180px'>
+			
+			    <line x1='0' y1='0' x2='400' y2='0' stroke='rgba(255,255,255,0.05)'/>
+			    <line x1='0' y1='37.5' x2='400' y2='37.5' stroke='rgba(255,255,255,0.05)'/>
+			    <line x1='0' y1='75' x2='400' y2='75' stroke='rgba(255,255,255,0.05)'/>
+			    <line x1='0' y1='112.5' x2='400' y2='112.5' stroke='rgba(255,255,255,0.05)'/>
+			
+			    <!-- 2024 -->
+			    <path d='M 0," & FORMAT(Y24_Q1,"0.00","en-US") &
+			        " L 133," & FORMAT(Y24_Q2,"0.00","en-US") &
+			        " L 266," & FORMAT(Y24_Q3,"0.00","en-US") &
+			        " L 400," & FORMAT(Y24_Q4,"0.00","en-US") & "'
+			        fill='none' stroke='#5b8fd9' stroke-width='2.5'/>
+			
+			    <!-- 2025 -->
+			    <path d='M 0," & FORMAT(Y25_Q1,"0.00","en-US") &
+			        " L 133," & FORMAT(Y25_Q2,"0.00","en-US") &
+			        " L 266," & FORMAT(Y25_Q3,"0.00","en-US") &
+			        " L 400," & FORMAT(Y25_Q4,"0.00","en-US") & "'
+			        fill='none' stroke='#4ec9e0' stroke-width='2.5'/>
+			
+			</svg>
+			</div>
+			
+			<div style='display:flex;justify-content:space-between;margin-top:10px;font-size:10px;color:#8fa3b8;font-weight:700'>
+			    <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
+			</div>
+			
+			</div>
+			"
+			
+			
+			```
+		lineageTag: 6cd95bd0-5903-44b5-896c-3e4c5dfbffc5
+
+	column Dummy
+		formatString: 0
+		lineageTag: 6fcc41e1-4672-43fc-8975-43794e0ea519
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Dummy]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'MEDIDAS BASE' = calculated
+		mode: import
+		source = DATATABLE("Dummy", INTEGER, {{1}})
+
+	annotation PBI_Id = 272135d600bf4b6292941c6600c3e1bd
+

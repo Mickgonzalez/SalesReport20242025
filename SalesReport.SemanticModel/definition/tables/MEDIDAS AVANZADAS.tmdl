@@ -1,0 +1,155 @@
+table 'MEDIDAS AVANZADAS'
+	lineageTag: 76949e98-233b-4243-bfed-2eb594fff6a8
+
+	measure 'Ticket Promedio' =
+			
+			DIVIDE([Ventas Totales], [Pedidos Únicos])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 4b726d4d-5e83-4c60-82e0-954513d1ff0b
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Unidades por Pedido' =
+			
+			DIVIDE([Cantidad Total], [Pedidos Únicos])
+		lineageTag: 441563e9-abe1-46b5-9801-c9c76a6f5b84
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Frecuencia de Compra' =
+			
+			DIVIDE([Pedidos Únicos], [Clientes Únicos])
+		lineageTag: 048ac2aa-0f29-4d78-b8c2-0abb4c69f70a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ventas YTD' =
+			
+			TOTALYTD([Ventas Totales], DIM_TIEMPO[fecha])
+		formatString: 0
+		lineageTag: 3d650833-baef-404f-997f-9807550e0f98
+
+	measure 'Ventas MTD' =
+			
+			TOTALMTD([Ventas Totales], DIM_TIEMPO[fecha])
+		formatString: 0
+		lineageTag: 58cdd0ce-7d8f-40cb-a478-b01ca70caa92
+
+	measure 'Ventas Promedio Mensual' =
+			
+			AVERAGEX(
+			    VALUES(DIM_TIEMPO[mes_nombre]),
+			    [Ventas Totales]
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 4fa957a4-ca54-4cd2-bdd7-d884a3f7edc0
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Crecimiento Interanual' = ```
+			
+			VAR ventas_actual = [Ventas Totales]
+			VAR ventas_anterior = 
+			    CALCULATE(
+			        [Ventas Totales],
+			        SAMEPERIODLASTYEAR(DIM_TIEMPO[fecha])
+			    )
+			RETURN
+			    DIVIDE(ventas_actual - ventas_anterior, ventas_anterior, 0)
+			```
+		formatString: 0
+		lineageTag: 44c031cd-13ca-48b1-a0d3-56caa60274c2
+
+	measure 'Ventas por Segmento' =
+			
+			CALCULATE(
+			    [Ventas Totales],
+			    ALLEXCEPT(DIM_CLIENTE, DIM_SEGMENTACION[nombre_segmentacion])
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 315c8895-aeed-4c01-86e0-e24057bce8e1
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure '% Participación Segmento' =
+			
+			DIVIDE(
+			    [Ventas Totales],
+			    CALCULATE([Ventas Totales], ALL(DIM_SEGMENTACION))
+			)
+		lineageTag: 1402299b-e188-4427-a3ee-749ebcd7da6b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Clientes por Segmento' = ```
+			
+			CALCULATE(
+			    [Clientes Únicos],
+			    ALLEXCEPT(DIM_CLIENTE, DIM_SEGMENTACION[nombre_segmentacion])
+			)
+			
+			```
+		formatString: 0
+		lineageTag: fe056536-fbae-4567-a10f-942ad69d38fc
+
+	measure 'Ventas por Ciudad' =
+			
+			CALCULATE(
+			    [Ventas Totales],
+			    ALLEXCEPT(DIM_CIUDAD, DIM_CIUDAD[ciudad])
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: a52a5dd3-e231-4cd4-b203-15dc82020df9
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Ventas por Departamento' =
+			
+			CALCULATE(
+			    [Ventas Totales],
+			    ALLEXCEPT(DIM_CIUDAD, DIM_CIUDAD[departamento])
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: c1150dff-4bd2-4eeb-bad4-2f21df2ebc55
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Pedidos Facturados' = ```
+			
+			CALCULATE(
+			    [Pedidos Únicos],
+			    DIM_ESTADO[estado] = "FACTURADO"
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 7a192c39-1112-4ccc-a28d-d83b78573760
+
+	measure 'Pedidos Pendientes' =
+			
+			CALCULATE(
+			    [Pedidos Únicos],
+			    DIM_ESTADO[estado] = "PENDIENTE"
+			)
+		formatString: 0
+		lineageTag: edc61293-4001-4013-bb09-3ce66928fafa
+
+	measure 'Tasa de Facturación' =
+			
+			DIVIDE([Pedidos Facturados], [Pedidos Únicos])
+		lineageTag: 5d7ee3bb-9a79-4702-b894-897eb7da7886
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition 'MEDIDAS AVANZADAS' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

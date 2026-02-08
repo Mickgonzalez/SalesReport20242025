@@ -1,0 +1,25 @@
+table DIM_ESTADO
+	lineageTag: 703f7661-508b-4def-a740-476813817488
+
+	column estado
+		dataType: string
+		lineageTag: 1a9e11e2-388b-4789-861f-4bae3eeb1a84
+		summarizeBy: none
+		sourceColumn: estado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_ESTADO = m
+		mode: import
+		source =
+				let
+				    Origen = BASE,
+				    Seleccionar = Table.SelectColumns(Origen,{"estado"}),
+				    Unicos = Table.Distinct(Seleccionar)
+				in
+				    Unicos
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,38 @@
+relationship 0b8ea47c-3158-43c2-a91b-5790019f8a7b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: BASE.fecha
+	toColumn: LocalDateTable_d6d5470e-19a6-409c-8e6e-605446c38c4e.Date
+
+relationship AutoDetected_40f15b5f-373e-459c-9017-03782ee9948b
+	fromColumn: FACT_VENTAS.estado
+	toColumn: DIM_ESTADO.estado
+
+relationship AutoDetected_4d3f7f91-7196-476e-8597-d4f6ac82dbf3
+	fromColumn: FACT_VENTAS.nit
+	toColumn: DIM_CLIENTE.nit
+
+relationship AutoDetected_42bd71f2-2d3e-40fb-b24c-500837acfd86
+	fromColumn: FACT_VENTAS.codigo
+	toColumn: DIM_PRODUCTO.codigo
+
+relationship AutoDetected_ae166052-0d79-4903-a2bf-2bf647779ef4
+	fromColumn: FACT_VENTAS.codigo_vendedor
+	toColumn: DIM_VENDEDOR.codigo_vendedor
+
+relationship 9fbc145e-db70-ee8e-bfbc-592ccf7fe3ed
+	fromColumn: FACT_VENTAS.codigo_ciudad
+	toColumn: DIM_CIUDAD.ciudad_id
+
+relationship AutoDetected_21fe6845-6c96-4bde-83b1-f9ff798b34f6
+	fromColumn: DIM_CLIENTE.id_segmentacion
+	toColumn: DIM_SEGMENTACION.id_segmentacion
+
+relationship a3294b25-041f-47a3-ba56-34bde16dbf46
+	joinOnDateBehavior: datePartOnly
+	fromColumn: DIM_TIEMPO.fecha
+	toColumn: LocalDateTable_022e5ecc-72b8-4c7b-9163-880c761455a7.Date
+
+relationship 2cd6856f-ce1e-0fa6-74e6-36fbb60c5fc0
+	fromColumn: FACT_VENTAS.fecha
+	toColumn: DIM_TIEMPO.fecha
+

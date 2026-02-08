@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "707d2d4b0201b7979119",
+  "position": {
+    "x": 715,
+    "y": 444,
+    "z": 5000,
+    "height": 414,
+    "width": 444,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASE"
+                    }
+                  },
+                  "Property": "HTML Tabla Marca"
+                }
+              },
+              "queryRef": "MEDIDAS BASE.HTML Tabla Marca",
+              "nativeQueryRef": "HTML Tabla Marca"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

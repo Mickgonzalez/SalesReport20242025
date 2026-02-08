@@ -1,0 +1,67 @@
+table DIM_CLIENTE
+	lineageTag: 0cf6bdd1-2ab0-4f02-b52d-fd79f1f3c4ef
+
+	column nit
+		dataType: int64
+		formatString: 0
+		lineageTag: e70aec6b-9d61-44af-8c78-a2581b1ea34e
+		summarizeBy: none
+		sourceColumn: nit
+
+		annotation SummarizationSetBy = Automatic
+
+	column cliente
+		dataType: string
+		lineageTag: 42ccadef-26dc-4a7b-be52-14cc12210001
+		summarizeBy: none
+		sourceColumn: cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column id_segmentacion
+		dataType: int64
+		formatString: 0
+		lineageTag: 61b94136-1bfe-4b11-ae96-4fd9571734c8
+		summarizeBy: none
+		sourceColumn: id_segmentacion
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DIM_CLIENTE = m
+		mode: import
+		source = ```
+				// DIM_CLIENTE
+				let
+				    Origen = BASE,
+				    // Limpiar segmentacion de la misma manera que en DIM_SEGMENTACION
+				    SegmentacionLimpia = Table.TransformColumns(Origen, {
+				        {"segmentacion", each 
+				            let
+				                texto = Text.Trim(Text.Upper(_))
+				            in
+				                if Text.Contains(texto, "ALIMENT") then "ALIMENTOS"
+				                else if Text.Contains(texto, "METAL") then "METALES"
+				                else if Text.Contains(texto, "FARMAC") then "FARMACEUTICA"
+				                else if Text.Contains(texto, "COMERCIO") then "COMERCIO"
+				                else texto
+				        }
+				    }),
+				    // Hacer merge con DIM_SEGMENTACION (asegúrate de que la columna de segmentacion limpia se llame igual que en DIM_SEGMENTACION)
+				    // En este punto, la columna se llama "segmentacion", pero en DIM_SEGMENTACION se llama "nombre_segmentacion"
+				    // Vamos a renombrar temporalmente para hacer el merge
+				    RenombrarParaMerge = Table.RenameColumns(SegmentacionLimpia, {{"segmentacion", "nombre_segmentacion"}}),
+				    // Hacer el merge
+				    Merge = Table.NestedJoin(RenombrarParaMerge, {"nombre_segmentacion"}, DIM_SEGMENTACION, {"nombre_segmentacion"}, "Segmentacion", JoinKind.LeftOuter),
+				    Expandir = Table.ExpandTableColumn(Merge, "Segmentacion", {"id_segmentacion"}, {"id_segmentacion"}),
+				    // Seleccionar columnas deseadas
+				    Seleccionar = Table.SelectColumns(Expandir, {"nit", "cliente", "id_segmentacion"}),
+				    // Eliminar duplicados por nit
+				    Unicos = Table.Distinct(Seleccionar, {"nit"})
+				in
+				    Unicos
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

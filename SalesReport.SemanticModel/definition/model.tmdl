@@ -1,0 +1,34 @@
+model Model
+	culture: es-CO
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["BASE","DIM_VENDEDOR","DIM_CLIENTE","DIM_PRODUCTO","DIM_ESTADO","DIM_TIEMPO","FACT_VENTAS","DIM_CIUDAD","DIM_SEGMENTACION","MEDIDAS AVANZADAS"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table BASE
+ref table DateTableTemplate_8c4718d2-097c-459a-8ad9-d9462aafd994
+ref table LocalDateTable_d6d5470e-19a6-409c-8e6e-605446c38c4e
+ref table DIM_VENDEDOR
+ref table DIM_CLIENTE
+ref table DIM_PRODUCTO
+ref table DIM_ESTADO
+ref table DIM_TIEMPO
+ref table FACT_VENTAS
+ref table DIM_CIUDAD
+ref table DIM_SEGMENTACION
+ref table 'Validar Relaciones'
+ref table 'MEDIDAS BASE'
+ref table 'MEDIDAS AVANZADAS'
+ref table 'MEDIDAS BASICAS POR VENDEDOR'
+ref table LocalDateTable_022e5ecc-72b8-4c7b-9163-880c761455a7
+ref table 'MEDIDAS BASICAS POR CLIENTE'
+
+ref cultureInfo es-CO
+

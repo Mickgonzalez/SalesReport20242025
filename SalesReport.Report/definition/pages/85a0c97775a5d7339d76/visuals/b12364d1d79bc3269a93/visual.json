@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "b12364d1d79bc3269a93",
+  "position": {
+    "x": 562.5,
+    "y": 21.25,
+    "z": 6000,
+    "height": 340,
+    "width": 446.25,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "query": {
+      "queryState": {
+        "content": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASE"
+                    }
+                  },
+                  "Property": "Gauge Sales HTML"
+                }
+              },
+              "queryRef": "MEDIDAS BASE.Gauge Sales HTML",
+              "nativeQueryRef": "Gauge Sales HTML"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

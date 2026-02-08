@@ -1,0 +1,161 @@
+table FACT_VENTAS
+	lineageTag: 515bd2c6-fca1-48d4-9761-018f18e2bdda
+
+	column estado
+		dataType: string
+		lineageTag: 202744a9-af58-4af4-9d8f-b4a1323bba76
+		summarizeBy: none
+		sourceColumn: estado
+
+		annotation SummarizationSetBy = Automatic
+
+	column pedido
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d090b48-a876-4c76-a359-7e92bd360911
+		summarizeBy: sum
+		sourceColumn: pedido
+
+		annotation SummarizationSetBy = Automatic
+
+	column fecha
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 58427b9b-551f-4eb0-a39d-8fb169f5e0b9
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column nit
+		dataType: int64
+		formatString: 0
+		lineageTag: 1092fdc6-5a7b-4405-a96d-4338a7fdf93b
+		summarizeBy: none
+		sourceColumn: nit
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo
+		dataType: string
+		lineageTag: 7cf5cd2f-0eaa-4019-9bf5-36b61eba3db9
+		summarizeBy: none
+		sourceColumn: codigo
+
+		annotation SummarizationSetBy = Automatic
+
+	column cantidad
+		dataType: int64
+		formatString: 0
+		lineageTag: 128e6b31-8b97-47f1-b61f-864afa15e635
+		summarizeBy: sum
+		sourceColumn: cantidad
+
+		annotation SummarizationSetBy = Automatic
+
+	column subtotal
+		dataType: decimal
+		formatString: \$#,0;(\$#,0);\$#,0
+		lineageTag: 578b4816-a305-4853-8316-10439c834467
+		summarizeBy: sum
+		sourceColumn: subtotal
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column codigo_vendedor
+		dataType: string
+		lineageTag: f7731ccf-53b7-4ee8-a4db-2e7067b7fa19
+		summarizeBy: none
+		sourceColumn: codigo_vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column codigo_ciudad
+		dataType: string
+		lineageTag: e8cd8fc0-a6cd-432d-ad78-7466dd4e432e
+		summarizeBy: none
+		sourceColumn: codigo_ciudad
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FACT_VENTAS = m
+		mode: import
+		source = ```
+				// En TablaPrincipal (renombrar a FACT_Ventas)
+				let
+				    Origen = BASE,
+				    
+				    // 1. NORMALIZACIÓN DE CIUDADES (SOLUCIÓN AL PROBLEMA YUMBO_ / YUMBO)
+				    CiudadNormalizada = Table.AddColumn(Origen, "ciudad_limpia", each 
+				        let
+				            // Convertir a mayúsculas y quitar espacios
+				            ciudadUpper = Text.Upper(Text.Trim([ciudad])),
+				            
+				            // Reemplazar múltiples espacios por uno solo
+				            partes = Text.Split(ciudadUpper, " "),
+				            partesNoVacias = List.Select(partes, each _ <> ""),
+				            ciudadUnEspacio = Text.Combine(partesNoVacias, " "),
+				            
+				            // Quitar caracteres especiales (guiones bajos, puntos, etc.)
+				            sinEspeciales = Text.Remove(ciudadUnEspacio, {"_", ".", ",", ";", ":", "!", "?"}),
+				            
+				            // Normalizar acentos
+				            sinAcentos = Text.Replace(
+				                Text.Replace(
+				                    Text.Replace(
+				                        Text.Replace(
+				                            Text.Replace(sinEspeciales, "Á", "A"), 
+				                        "É", "E"), 
+				                    "Í", "I"), 
+				                "Ó", "O"), 
+				            "Ú", "U")
+				        in
+				            sinAcentos
+				    ),
+				    
+				    // 2. EXTRAER CÓDIGO DE VENDEDOR
+				    CodigoVendedor = Table.AddColumn(CiudadNormalizada, "codigo_vendedor", each 
+				        Text.Trim(Text.Start([nom_vendedor], 3))),
+				    
+				    // 3. CREAR CÓDIGO DE CIUDAD CON LA CIUDAD NORMALIZADA
+				    ConCodigoCiudad = Table.AddColumn(CodigoVendedor, "codigo_ciudad",
+				        each Text.Replace([ciudad_limpia], " ", "_")),        
+				    
+				    // 4. VALIDAR Y CORREGIR CASOS ESPECÍFICOS (YUMBO_, etc.)
+				    CodigoCiudadCorregido = Table.TransformColumns(ConCodigoCiudad, {
+				        {"codigo_ciudad", each 
+				            // Caso específico: quitar guión bajo al final
+				            if Text.EndsWith(_, "_") then Text.Start(_, Text.Length(_) - 1)
+				            else _,
+				            type text}
+				    }),
+				    
+				    // 5. VERIFICAR QUE NO HAYA CIUDADES DUPLICADAS POR ERROR DE NORMALIZACIÓN
+				    // (Esta es una verificación, podemos comentarla después)
+				    #"Verificacion Duplicados" = Table.AddColumn(CodigoCiudadCorregido, "ciudad_original_normalizada", 
+				        each [ciudad] & " → " & [codigo_ciudad]),
+				    
+				    // 6. Eliminar columnas que ahora están en dimensiones
+				    ColumnasAEliminar = {"cliente", "ciudad", "segmentacion", "marca", "descripcion", 
+				                        "nota_adicional", "nom_vendedor", "ciudad_limpia"},   
+				    TablaLimpia = Table.RemoveColumns(#"Verificacion Duplicados", ColumnasAEliminar),
+				    
+				    // 7. Filtrar para ver solo problemas de YUMBO (opcional, para depuración)
+				    // #"Filtrar YUMBO" = Table.SelectRows(TablaLimpia, each Text.Contains([codigo_ciudad], "YUMBO")),
+				    
+				    #"Filas ordenadas" = Table.Sort(TablaLimpia,{{"codigo_ciudad", Order.Ascending}}),
+				    #"Columnas quitadas" = Table.RemoveColumns(#"Filas ordenadas",{"ciudad_original_normalizada"}),
+				    #"Filas filtradas" = Table.SelectRows(#"Columnas quitadas", each true)
+				    
+				in
+				    #"Filas filtradas"
+				```
+
+	annotation PBI_NavigationStepName = Navegación
+
+	annotation PBI_ResultType = Table
+

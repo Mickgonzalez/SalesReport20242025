@@ -1,0 +1,295 @@
+table 'MEDIDAS BASICAS POR VENDEDOR'
+	lineageTag: 5c5bf0c3-e6c6-4d5a-a497-7a6062bf32f5
+
+	measure 'Ventas por Vendedor' =
+			
+			CALCULATE(
+			    [Ventas Totales],
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: dfbfb4d2-9ad7-4064-9cbb-54c9e00c6c1d
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Pedidos por Vendedor' =
+			
+			CALCULATE(
+			    [Pedidos Únicos],
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		formatString: 0
+		lineageTag: 85afa8d4-9cfc-4aa2-985a-a2da1c41306a
+
+	measure 'Clientes por Vendedor' =
+			
+			CALCULATE(
+			    [Clientes Únicos],
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		formatString: 0
+		lineageTag: 213fc7aa-d2be-4931-8c90-ab1dd2eb3c96
+
+	measure 'Productos por Vendedor' =
+			
+			CALCULATE(
+			    [Productos Únicos],
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		formatString: 0
+		lineageTag: 0ec64616-6308-4f28-8e03-5d2fe2477d2a
+
+	measure 'Ticket Promedio Vendedor' =
+			
+			DIVIDE([Ventas por Vendedor], [Pedidos por Vendedor])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 146e7c23-cc9f-43e7-bd79-e1e8038e2a4c
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Unidades por Pedido Vendedor' =
+			
+			CALCULATE(
+			    [Unidades por Pedido],
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		lineageTag: 45bd913c-eccc-4d81-98aa-296433d8625b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Frecuencia Cliente Vendedor' =
+			
+			DIVIDE([Pedidos por Vendedor], [Clientes por Vendedor])
+		lineageTag: 63185e4b-0b6b-4375-95e0-3ff4f8863551
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Días Activos Vendedor' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(DIM_TIEMPO[fecha]),
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		formatString: 0
+		lineageTag: 8d215714-c511-4c75-9f37-1ff157c2d210
+
+	measure 'Crecimiento Vendedor' = ```
+			
+			VAR ventas_actual = [Ventas por Vendedor]
+			VAR ventas_anterior = 
+			    CALCULATE(
+			        [Ventas por Vendedor],
+			        SAMEPERIODLASTYEAR(DIM_TIEMPO[fecha])
+			    )
+			RETURN
+			    DIVIDE(ventas_actual - ventas_anterior, ventas_anterior, 0)
+			```
+		formatString: 0
+		lineageTag: ef8adfbe-822f-4d9d-8fc3-29e1d6554a59
+
+	measure 'Crecimiento Pedidos Vendedor' = ```
+			
+			VAR pedidos_actual = [Pedidos por Vendedor]
+			VAR pedidos_anterior = 
+			    CALCULATE(
+			        [Pedidos por Vendedor],
+			        SAMEPERIODLASTYEAR(DIM_TIEMPO[fecha])
+			    )
+			RETURN
+			    DIVIDE(pedidos_actual - pedidos_anterior, pedidos_anterior, 0)
+			```
+		formatString: 0
+		lineageTag: 544dc476-9b0a-4ad9-8236-d2fc3b6bd0b4
+
+	measure 'Nuevos Clientes Vendedor' = ```
+			
+			CALCULATE(
+			    COUNTROWS(
+			        FILTER(
+			            DIM_CLIENTE,
+			            VAR primer_compra = 
+			                CALCULATE(
+			                    MIN(FACT_VENTAS[fecha]),
+			                    ALLEXCEPT(FACT_VENTAS, DIM_CLIENTE[nit])
+			                )
+			            RETURN
+			                primer_compra >= MIN(DIM_TIEMPO[fecha])
+			        )
+			    ),
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+			```
+		formatString: 0
+		lineageTag: 7dcbd70e-49f8-4988-81a9-0d3feb35865e
+
+	measure 'Ventas por Día Vendedor' =
+			
+			DIVIDE([Ventas por Vendedor], [Días Activos Vendedor])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 8af0e8a2-a67e-4774-8cd9-b33332b8e893
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Pedidos por Día Vendedor' =
+			
+			DIVIDE([Pedidos por Vendedor], [Días Activos Vendedor])
+		lineageTag: bb3fa355-a786-4deb-aaa5-7838af1cefde
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ventas por Cliente Vendedor' =
+			
+			DIVIDE([Ventas por Vendedor], [Clientes por Vendedor])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 7e1c708a-d48f-4137-93b4-090f1fd415f3
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Ventas por Segmento Vendedor' =
+			
+			CALCULATE(
+			    [Ventas por Vendedor],
+			    ALLEXCEPT(DIM_CLIENTE, DIM_SEGMENTACION[nombre_segmentacion])
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 25bd946b-cd39-4921-b611-4589aeaca33d
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Clientes por Segmento Vendedor' =
+			
+			CALCULATE(
+			    [Clientes por Vendedor],
+			    ALLEXCEPT(DIM_CLIENTE, DIM_SEGMENTACION[nombre_segmentacion])
+			)
+		formatString: 0
+		lineageTag: 286270aa-227a-4dd8-a141-90c5c08caff8
+
+	measure 'Ciudades por Vendedor' = ```
+			
+			CALCULATE(
+			    DISTINCTCOUNT(DIM_CIUDAD[ciudad]),
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+			
+			
+			```
+		formatString: 0
+		lineageTag: 4b929934-2b12-4e07-9be3-96d6110d0af8
+
+	measure 'Departamentos por Vendedor' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT(DIM_CIUDAD[departamento]),
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		formatString: 0
+		lineageTag: 7eb8da8b-d276-4e56-9b90-99e7825cbb24
+
+	measure 'Tasa Facturación Vendedor' =
+			
+			CALCULATE(
+			    [Tasa de Facturación],
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		lineageTag: 230015a0-905c-4122-bc20-deba4b89a556
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Pedidos Pendientes Vendedor' =
+			
+			CALCULATE(
+			    [Pedidos Pendientes],
+			    ALLEXCEPT(FACT_VENTAS, DIM_VENDEDOR[nom_vendedor])
+			)
+		formatString: 0
+		lineageTag: 15279ba1-6b4b-4ade-b4ae-4c0dddcce4b5
+
+	measure 'Ventas Marca Vendedor Año' =
+			
+			CALCULATE(
+			    [Ventas Totales],
+			    ALLEXCEPT(
+			        FACT_VENTAS,
+			        DIM_VENDEDOR[nom_vendedor],
+			        DIM_PRODUCTO[marca],
+			        DIM_TIEMPO[año]
+			    )
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 0ae9705b-79b0-4a18-8c83-debca9228458
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Ranking Vendedores Ventas' = ```
+			
+			IF(
+			    HASONEVALUE(DIM_VENDEDOR[nom_vendedor]),
+			    RANKX(
+			        ALL(DIM_VENDEDOR[nom_vendedor]),
+			        [Ventas por Vendedor],
+			        ,
+			        DESC,
+			        DENSE
+			    )
+			)
+			
+			```
+		formatString: 0
+		lineageTag: eacda27c-0062-4155-a6a3-e8f4109d3e57
+
+	measure 'Ranking Vendedores Ventas Sorted' = -[Ranking Vendedores Ventas]
+		formatString: 0
+		lineageTag: d32919fe-0426-4847-a800-4ef9ff4bfcbe
+
+	measure 'Top Marcas por Vendedor' = ```
+			
+			// Devuelve la marca principal de cada vendedor
+			VAR marcas_vendedor = 
+			    SUMMARIZE(
+			        FILTER(
+			            FACT_VENTAS,
+			            [Ventas por Vendedor] > 0
+			        ),
+			        DIM_PRODUCTO[marca],
+			        "Ventas", [Ventas Totales]
+			    )
+			RETURN
+			    MAXX(TOPN(1, marcas_vendedor, [Ventas], DESC), [marca])
+			```
+		lineageTag: 602a0788-34bf-4e71-9dcb-68b8c1bf02f6
+
+	measure '// Medida para gráfico específicoVentas para Gráfico Agrupado' =
+			
+			VAR vendedor_actual = SELECTEDVALUE(DIM_VENDEDOR[nom_vendedor])
+			VAR marca_actual = SELECTEDVALUE(DIM_PRODUCTO[marca])
+			VAR ano_actual = SELECTEDVALUE(DIM_TIEMPO[año])
+			RETURN
+			    CALCULATE(
+			        [Ventas Totales],
+			        DIM_VENDEDOR[nom_vendedor] = vendedor_actual,
+			        DIM_PRODUCTO[marca] = marca_actual,
+			        DIM_TIEMPO[año] = ano_actual
+			    )
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 3f554647-c5ae-4efd-95b1-220257f37ebd
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Column
+		formatString: 0
+		lineageTag: 5e2240e0-a8a6-4f83-9e11-69b118666d00
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'MEDIDAS BASICAS POR VENDEDOR' = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = f0291a9f8d3641e988b9d170bc75495d
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

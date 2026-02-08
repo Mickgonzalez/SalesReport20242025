@@ -1,0 +1,41 @@
+table 'MEDIDAS BASICAS POR CLIENTE'
+	lineageTag: 797742e3-248d-42ef-8782-c51800f72b87
+
+	measure 'Ranking Cliente' =
+			
+			RANKX(
+			    ALL(DIM_CLIENTE[cliente]),
+			    [Ventas Totales],
+			    ,
+			    DESC,
+			    Dense
+			)
+		formatString: 0
+		lineageTag: 2abcf80a-aa45-489d-bfb9-1130d2ccd6cd
+
+	measure 'Cliente Top 5'
+		lineageTag: ab027efd-f55f-43fe-ab2d-d504710f5607
+
+	measure 'Ventas Totales2' = SUM(FACT_VENTAS[subtotal])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: e23af4b9-387b-4492-a6ec-0bab3bff1b83
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Column
+		formatString: 0
+		lineageTag: c9b80531-2ac2-458d-8a02-853bf0b92d97
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'MEDIDAS BASICAS POR CLIENTE' = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = 51f29618298f4f67b4e508dbc2157b58
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+

@@ -1,0 +1,140 @@
+table 'Validar Relaciones'
+	lineageTag: 3e468c94-5967-47c9-bd24-e4606f6a4e00
+
+	measure 'Validar Relaciones' = ```
+			
+			// 1. Contar clientes sin segmentación (id_segmentacion en blanco)
+			VAR ClientesSinSegmentacion = 
+			    COUNTROWS(
+			        FILTER(
+			            DIM_CLIENTE,
+			            ISBLANK(DIM_CLIENTE[id_segmentacion])
+			        )
+			    )
+			
+			// 2. Contar pedidos cuyos NIT no existen en DIM_CLIENTE
+			VAR PedidosSinCliente = 
+			    COUNTROWS(
+			        FILTER(
+			            // Crear una tabla con un pedido y su NIT
+			            SUMMARIZE(
+			                FACT_VENTAS,
+			                FACT_VENTAS[Pedido],
+			                "NIT_Pedido", MAX(FACT_VENTAS[nit])  // Asumimos un NIT por pedido
+			            ),
+			            // Verificar si el NIT no está en DIM_CLIENTE
+			            NOT(
+			                CONTAINS(
+			                    DIM_CLIENTE,
+			                    DIM_CLIENTE[nit], [NIT_Pedido]
+			                )
+			            )
+			        )
+			    )
+			
+			// 3. Devolver un mensaje claro
+			RETURN
+			    IF(
+			        ClientesSinSegmentacion + PedidosSinCliente = 0,
+			        "✅ TODAS LAS RELACIONES SON VÁLIDAS",
+			        "⚠️ PROBLEMAS ENCONTRADOS: " & 
+			        ClientesSinSegmentacion & " cliente(s) sin segmentación, " &
+			        PedidosSinCliente & " pedido(s) sin cliente"
+			    )
+			```
+		lineageTag: 73542790-a33a-4a39-8fdf-7406f057bf22
+
+	measure 'Test Relación' =
+			
+			COUNTROWS(
+			    RELATEDTABLE(DIM_TIEMPO)
+			)
+		formatString: 0
+		lineageTag: 9b8dd340-b718-4fc0-a46c-a3b6192cfe5b
+
+	measure 'Conteo 2024' =
+			
+			CALCULATE(
+			    COUNTROWS(FACT_VENTAS),
+			    DIM_TIEMPO[año] = 2024
+			)
+		formatString: 0
+		lineageTag: 6c7d1339-669e-4ebb-9685-a135d0a69c03
+
+	measure 'Años Fact Únicos' =
+			
+			CONCATENATEX(
+			    VALUES(FACT_VENTAS[fecha]),
+			    YEAR([fecha]), ", "
+			)
+		lineageTag: d71b0b81-87d8-4960-8c83-39a32a91b512
+
+	measure '// En cualquier tabla, pero mejor en FACT_VENTASDiagnóstico Relación' =
+			
+			COUNTROWS(
+			    FILTER(
+			        FACT_VENTAS,
+			        NOT(ISBLANK(RELATED(DIM_TIEMPO[año])))
+			    )
+			)
+		formatString: 0
+		lineageTag: d0fea204-636e-4609-a23c-9b1562edda66
+
+	measure 'Test Relacion' =
+			
+			CALCULATE(
+			    COUNTROWS(FACT_VENTAS),
+			    DIM_TIEMPO[año] = 2025
+			)
+		formatString: 0
+		lineageTag: fe940b62-938e-4997-ab43-baceeb60d6a4
+
+	measure 'Ventas Test' = SUM(FACT_VENTAS[subtotal])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: edbc3aaf-2d46-4e1c-8e91-890f533ce417
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Color Fila Cliente' =
+			
+			VAR ClienteSeleccionado = SELECTEDVALUE(DIM_CLIENTE[cliente])
+			VAR ClienteActual = MAX(DIM_CLIENTE[cliente])
+			RETURN
+			IF(
+			    NOT(ISBLANK(ClienteSeleccionado)) && ClienteSeleccionado = ClienteActual,
+			    "#FFEBEE",  // Rojo suave para la fila seleccionada
+			    "#FFFFFF"   // Blanco para las demás
+			)
+		lineageTag: ca728219-53a7-4ea4-8f5a-a6247cf622a0
+
+	measure 'Test V24 Q1' =
+			
+			CALCULATE(
+			    [Ventas 2024],
+			    FILTER(
+			        ALL('DIM_TIEMPO'),
+			        'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 1"
+			    )
+			)
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 5fa422ee-f1c5-429e-b19b-c5a25e7700a2
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Column
+		formatString: 0
+		lineageTag: f17eb35d-22ff-4b9f-bda5-8d9a1da306d2
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Column]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Validar Relaciones' = calculated
+		mode: import
+		source = Row("Column", BLANK())
+
+	annotation PBI_Id = be57310f1a574333a828c6d1851c5f62
+
+	annotation 436ba87b-9c83-4389-a31b-ebd06a36be98 = {"Expression":""}
+
