@@ -89,7 +89,7 @@ table 'MEDIDAS BASE'
 			.kpi-card {
 			    max-width: 520px;
 			    min-width: 360px;
-			    height: 345px; /* <--- Añade esto */
+			    height: 350px; /* <--- Añade esto */
 			    background: #0d121a;
 			    border-radius: 18px;
 			    padding: 20px;
@@ -524,7 +524,7 @@ table 'MEDIDAS BASE'
 			    .gauge-container {
 			        width: 100%;
 			        max-width: 520px;
-			        height: 345px; /* Igualamos el alto */
+			        height: 350px; /* Igualamos el alto */
 			        background: #0d121a;
 			        border-radius: 18px;
 			        padding: 20px;
@@ -1115,42 +1115,42 @@ table 'MEDIDAS BASE'
 			    <div class='op-grid'>
 			
 			        <div class='op-item'>
-			            Ticket Promedio
+			            Average Ticket
 			            <span class='op-value'>
 			                " & FORMAT([Ticket Promedio], "$#,##0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Unidades por Pedido
+			            Units by Order
 			            <span class='op-value'>
 			                " & FORMAT([Unidades por Pedido], "0.0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Tasa de Facturación
+			            Billing Rate
 			            <span class='op-value op-info'>
 			                " & FORMAT([Tasa de Facturación], "0.0%") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Ventas Promedio Mensual
+			            Average Monthly Sales
 			            <span class='op-value'>
 			                " & FORMAT([Ventas Promedio Mensual], "$#,##0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Pedidos Pendientes
+			            Sales YTD
 			            <span class='op-value op-warning'>
-			                " & FORMAT([Pedidos Pendientes], "#,##0") & "
+			                " & FORMAT([Ventas YTD], "#,##0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Pedidos Facturados
+			            Invoiced Orders
 			            <span class='op-value op-success'>
 			                " & FORMAT([Pedidos Facturados], "#,##0") & "
 			            </span>
@@ -1236,42 +1236,42 @@ table 'MEDIDAS BASE'
 			    <div class='op-grid'>
 			
 			        <div class='op-item'>
-			            Frecuencia Cliente Vendedor
+			            Frequency Customer Vendor
 			            <span class='op-value op-info'>
 			                " & FORMAT([Frecuencia Cliente Vendedor], "0.00") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Pedidos Pendientes Vendedor
+			            Pending Orders by Seller
 			            <span class='op-value op-warning'>
 			                " & FORMAT([Pedidos Pendientes Vendedor], "#,##0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Pedidos por Día Vendedor
+			            Orders Per Day by Sellers
 			            <span class='op-value op-info'>
 			                " & FORMAT([Pedidos por Día Vendedor], "0.0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Pedidos por Vendedor
+			            Orders by Seller
 			            <span class='op-value'>
 			                " & FORMAT([Pedidos por Vendedor], "#,##0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Top Marcas por Vendedor
+			            Top Brands by Vendor
 			            <span class='op-value'>
 			                " & FORMAT([Top Marcas por Vendedor], "#,##0") & "
 			            </span>
 			        </div>
 			
 			        <div class='op-item'>
-			            Unidades por Pedido Vendedor
+			            Units Per Order Seller
 			            <span class='op-value op-success'>
 			                " & FORMAT([Unidades por Pedido Vendedor], "0.0") & "
 			            </span>
@@ -1499,9 +1499,9 @@ table 'MEDIDAS BASE'
 			<div class='html-wrapper'>
 			<table class='exec-table'>
 			    <tr>
-			        <th>Segmento</th>
-			        <th class='num'>Ventas</th>
-			        <th style='width:40%'>Distribución</th>
+			        <th>INDUSTRY</th>
+			        <th class='num'>TOTAL SALES</th>
+			        <th style='width:40%'>DISTRIBUTION</th>
 			    </tr>
 			"
 			&
@@ -1584,12 +1584,14 @@ table 'MEDIDAS BASE'
 			        SWITCH (
 			            TRUE(),
 			            [ciudad] = "Others", "#3a3f4b",
-			            [RankPct] = 1, "#4dfed8",
-			            [RankPct] = 2, "#43e6c5",
-			            [RankPct] = 3, "#3bcfb2",
-			            [RankPct] = 4, "#33b89f",
-			            [RankPct] = 5, "#2aa18c",
-			            "#4dfed8"
+			
+			    [RankPct] = 1, "#4dfed8",  -- verde aqua (base)
+			    [RankPct] = 2, "#44f0de",
+			    [RankPct] = 3, "#3bdfe4",
+			    [RankPct] = 4, "#32cde9",
+			    [RankPct] = 5, "#2abaf0",
+			
+			    "#4dfed8"
 			        )
 			    )
 			
@@ -1780,15 +1782,18 @@ table 'MEDIDAS BASE'
 			        TablaOrdenada,
 			        "Color",
 			        SWITCH (
-			            TRUE(),
-			            [departamento] = "Others", "#3a3f4b",
-			            [RankPct] = 1, "#4dfed8",
-			            [RankPct] = 2, "#43e6c5",
-			            [RankPct] = 3, "#3bcfb2",
-			            [RankPct] = 4, "#33b89f",
-			            [RankPct] = 5, "#2aa18c",
-			            "#4dfed8"
-			        )
+			    TRUE(),
+			    [departamento] = "Others", "#3a3f4b",
+			
+			    [RankPct] = 1, "#4dfed8",  -- verde aqua base
+			    [RankPct] = 2, "#44f0de",
+			    [RankPct] = 3, "#3bdfe4",
+			    [RankPct] = 4, "#32cde9",
+			    [RankPct] = 5, "#2abaf0",
+			
+			    "#4dfed8"
+			)
+			
 			    )
 			
 			VAR DonutSize = 160

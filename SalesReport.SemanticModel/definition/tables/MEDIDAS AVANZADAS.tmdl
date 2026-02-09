@@ -26,7 +26,7 @@ table 'MEDIDAS AVANZADAS'
 	measure 'Ventas YTD' =
 			
 			TOTALYTD([Ventas Totales], DIM_TIEMPO[fecha])
-		formatString: 0
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
 		lineageTag: 3d650833-baef-404f-997f-9807550e0f98
 
 	measure 'Ventas MTD' =

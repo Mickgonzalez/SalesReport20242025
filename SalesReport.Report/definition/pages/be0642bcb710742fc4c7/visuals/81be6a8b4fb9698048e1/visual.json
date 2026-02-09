@@ -1,38 +1,19 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
-  "name": "e509cdc2f160c2272356",
+  "name": "81be6a8b4fb9698048e1",
   "position": {
-    "x": 42.222222222222221,
-    "y": 482.22222222222223,
-    "z": 3000,
-    "height": 267.77777777777777,
-    "width": 590,
-    "tabOrder": 3000
+    "x": 1145.707656612529,
+    "y": 384.2227378190255,
+    "z": 4000,
+    "height": 193.50348027842227,
+    "width": 349.41995359628766,
+    "tabOrder": 4000
   },
   "visual": {
-    "visualType": "donutChart",
+    "visualType": "cardVisual",
     "query": {
       "queryState": {
-        "Category": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "DIM_CIUDAD"
-                    }
-                  },
-                  "Property": "ciudad"
-                }
-              },
-              "queryRef": "DIM_CIUDAD.ciudad",
-              "nativeQueryRef": "ciudad",
-              "active": true
-            }
-          ]
-        },
-        "Y": {
+        "Data": {
           "projections": [
             {
               "field": {
@@ -42,11 +23,25 @@
                       "Entity": "MEDIDAS AVANZADAS"
                     }
                   },
-                  "Property": "Ventas por Ciudad"
+                  "Property": "Ventas YTD"
                 }
               },
-              "queryRef": "MEDIDAS AVANZADAS.Ventas por Ciudad",
-              "nativeQueryRef": "Ventas por Ciudad"
+              "queryRef": "MEDIDAS AVANZADAS.Ventas YTD",
+              "nativeQueryRef": "Ventas YTD"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Ventas MTD"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Ventas MTD",
+              "nativeQueryRef": "Ventas MTD"
             }
           ]
         }
@@ -61,7 +56,7 @@
                     "Entity": "MEDIDAS AVANZADAS"
                   }
                 },
-                "Property": "Ventas por Ciudad"
+                "Property": "Ventas YTD"
               }
             },
             "direction": "Descending"
