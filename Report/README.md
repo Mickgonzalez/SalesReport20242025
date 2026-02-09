@@ -7,7 +7,7 @@ The goal of this project is to analyze sales performance in the Cali region, ide
 
 ## 📂 Repository Structure
 * **Data/**: Contains the raw Excel data sources (`SalesData_Cali_2024_2025.xlsx`).
-* **Report/**: Contains the Power BI dashboard file (`Sales_Dashboard_Cali.pbix`).
+* **Report/**: Contains the Power BI dashboard file (`SalesReport.pbix` and `SalesReport.pbip`).
 * **Images/**: (Optional) Screenshots of the dashboard for quick preview.
 
 ## 🛠️ Tools Used
@@ -25,7 +25,7 @@ The goal of this project is to analyze sales performance in the Cali region, ide
 ## 🚀 How to View the Report
 1. Clone this repository or download the ZIP file.
 2. Navigate to the `Report/` folder.
-3. Open `Sales_Dashboard_Cali.pbix` using **Power BI Desktop**.
+3. Open `SalesReport.pbix` using **Power BI Desktop**.
 
 ---
 *Created with ☕ by [Mick Gonzalez]*
