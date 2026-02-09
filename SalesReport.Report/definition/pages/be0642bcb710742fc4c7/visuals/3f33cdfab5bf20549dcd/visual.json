@@ -1,0 +1,74 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "3f33cdfab5bf20549dcd",
+  "position": {
+    "x": 0,
+    "y": 43.391521197007478,
+    "z": 4000,
+    "height": 222.94264339152119,
+    "width": 450.37406483790522,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "clusteredBarChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_SEGMENTACION"
+                    }
+                  },
+                  "Property": "nombre_segmentacion"
+                }
+              },
+              "queryRef": "DIM_SEGMENTACION.nombre_segmentacion",
+              "nativeQueryRef": "nombre_segmentacion",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Clientes por Segmento"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Clientes por Segmento",
+              "nativeQueryRef": "Clientes por Segmento"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "MEDIDAS AVANZADAS"
+                  }
+                },
+                "Property": "Clientes por Segmento"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "58c91844279613107be1",
+  "position": {
+    "x": 0,
+    "y": 522.19451371571074,
+    "z": 6000,
+    "height": 155.61097256857855,
+    "width": 772.069825436409,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_CIUDAD"
+                    }
+                  },
+                  "Property": "departamento"
+                }
+              },
+              "queryRef": "DIM_CIUDAD.departamento",
+              "nativeQueryRef": "departamento",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Ventas por Departamento"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Ventas por Departamento",
+              "nativeQueryRef": "Ventas por Departamento"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "MEDIDAS AVANZADAS"
+                  }
+                },
+                "Property": "Ventas por Departamento"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

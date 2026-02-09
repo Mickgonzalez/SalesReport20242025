@@ -1,0 +1,75 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "e509cdc2f160c2272356",
+  "position": {
+    "x": 0,
+    "y": 658.354114713217,
+    "z": 7000,
+    "height": 155.61097256857855,
+    "width": 772.069825436409,
+    "tabOrder": 7000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_CIUDAD"
+                    }
+                  },
+                  "Property": "ciudad"
+                }
+              },
+              "queryRef": "DIM_CIUDAD.ciudad",
+              "nativeQueryRef": "ciudad",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Ventas por Ciudad"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Ventas por Ciudad",
+              "nativeQueryRef": "Ventas por Ciudad"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "MEDIDAS AVANZADAS"
+                  }
+                },
+                "Property": "Ventas por Ciudad"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

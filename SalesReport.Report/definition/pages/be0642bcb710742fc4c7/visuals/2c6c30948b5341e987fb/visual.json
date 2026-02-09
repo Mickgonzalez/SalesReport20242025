@@ -1,0 +1,126 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "2c6c30948b5341e987fb",
+  "position": {
+    "x": 0,
+    "y": 389.02743142144641,
+    "z": 5000,
+    "height": 264.83790523690772,
+    "width": 1446.8827930174564,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Ticket Promedio"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Ticket Promedio",
+              "nativeQueryRef": "Ticket Promedio"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Unidades por Pedido"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Unidades por Pedido",
+              "nativeQueryRef": "Unidades por Pedido"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Tasa de Facturación"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Tasa de Facturación",
+              "nativeQueryRef": "Tasa de Facturación"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Ventas Promedio Mensual"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Ventas Promedio Mensual",
+              "nativeQueryRef": "Ventas Promedio Mensual"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Pedidos Pendientes"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Pedidos Pendientes",
+              "nativeQueryRef": "Pedidos Pendientes"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS AVANZADAS"
+                    }
+                  },
+                  "Property": "Pedidos Facturados"
+                }
+              },
+              "queryRef": "MEDIDAS AVANZADAS.Pedidos Facturados",
+              "nativeQueryRef": "Pedidos Facturados"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "MEDIDAS AVANZADAS"
+                  }
+                },
+                "Property": "Ticket Promedio"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

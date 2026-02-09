@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
   "name": "28d1b1fef6b2303717a4",
   "position": {
-    "x": 16,
-    "y": 392,
-    "z": 4000,
-    "height": 52,
-    "width": 694,
-    "tabOrder": 4000
+    "x": 15.714285714285715,
+    "y": 377.14285714285717,
+    "z": 3000,
+    "height": 52.857142857142861,
+    "width": 694.28571428571433,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "textSlicer",
@@ -45,7 +45,7 @@
             "backShow": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "false"
                 }
               }
             },
@@ -55,6 +55,18 @@
                   "expr": {
                     "Literal": {
                       "Value": "'#0D121A'"
+                    }
+                  }
+                }
+              }
+            },
+            "iconColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
                     }
                   }
                 }
@@ -93,6 +105,18 @@
               "expr": {
                 "Literal": {
                   "Value": "'Filter by Client'"
+                }
+              }
+            },
+            "dismissColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
+                    }
+                  }
                 }
               }
             }
@@ -157,7 +181,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#4DFED8'"
                     }
                   }
                 }
@@ -166,7 +190,14 @@
             "radius": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "18D"
+                }
+              }
+            },
+            "width": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

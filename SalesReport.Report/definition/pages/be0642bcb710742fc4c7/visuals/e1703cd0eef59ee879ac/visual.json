@@ -1,0 +1,126 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
+  "name": "e1703cd0eef59ee879ac",
+  "position": {
+    "x": 270,
+    "y": 875,
+    "z": 8000,
+    "height": 150,
+    "width": 1240,
+    "tabOrder": 8000
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASICAS POR VENDEDOR"
+                    }
+                  },
+                  "Property": "Frecuencia Cliente Vendedor"
+                }
+              },
+              "queryRef": "MEDIDAS BASICAS POR VENDEDOR.Frecuencia Cliente Vendedor",
+              "nativeQueryRef": "Frecuencia Cliente Vendedor"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASICAS POR VENDEDOR"
+                    }
+                  },
+                  "Property": "Pedidos Pendientes Vendedor"
+                }
+              },
+              "queryRef": "MEDIDAS BASICAS POR VENDEDOR.Pedidos Pendientes Vendedor",
+              "nativeQueryRef": "Pedidos Pendientes Vendedor"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASICAS POR VENDEDOR"
+                    }
+                  },
+                  "Property": "Pedidos por Día Vendedor"
+                }
+              },
+              "queryRef": "MEDIDAS BASICAS POR VENDEDOR.Pedidos por Día Vendedor",
+              "nativeQueryRef": "Pedidos por Día Vendedor"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASICAS POR VENDEDOR"
+                    }
+                  },
+                  "Property": "Pedidos por Vendedor"
+                }
+              },
+              "queryRef": "MEDIDAS BASICAS POR VENDEDOR.Pedidos por Vendedor",
+              "nativeQueryRef": "Pedidos por Vendedor"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASICAS POR VENDEDOR"
+                    }
+                  },
+                  "Property": "Top Marcas por Vendedor"
+                }
+              },
+              "queryRef": "MEDIDAS BASICAS POR VENDEDOR.Top Marcas por Vendedor",
+              "nativeQueryRef": "Top Marcas por Vendedor"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "MEDIDAS BASICAS POR VENDEDOR"
+                    }
+                  },
+                  "Property": "Unidades por Pedido Vendedor"
+                }
+              },
+              "queryRef": "MEDIDAS BASICAS POR VENDEDOR.Unidades por Pedido Vendedor",
+              "nativeQueryRef": "Unidades por Pedido Vendedor"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "MEDIDAS BASICAS POR VENDEDOR"
+                  }
+                },
+                "Property": "Frecuencia Cliente Vendedor"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

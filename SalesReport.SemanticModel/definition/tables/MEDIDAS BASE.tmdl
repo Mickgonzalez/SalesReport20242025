@@ -89,14 +89,14 @@ table 'MEDIDAS BASE'
 			.kpi-card {
 			    max-width: 520px;
 			    min-width: 360px;
-			    height: 320px; /* <--- Añade esto */
+			    height: 345px; /* <--- Añade esto */
 			    background: #0d121a;
 			    border-radius: 18px;
 			    padding: 20px;
 			    color: #ffffff;
 			    font-family: 'Segoe UI', sans-serif;
-			    box-shadow: 0 0 40px rgba(77,254,216,0.15);
-			    border: 1px solid rgba(77,254,216,0.25);
+			    box-shadow: 0;
+			    border: 2px solid rgba(77,254,216,0.25);
 			}
 			
 			.kpi-title {
@@ -259,6 +259,8 @@ table 'MEDIDAS BASE'
 			    width: 100%;
 			    box-sizing: border-box;
 			    font-family: 'Segoe UI', sans-serif;
+			    border: 2px solid rgba(77,254,216,0.25);
+			    box-shadow: 0;
 			}
 			
 			/* ===== TABLA ===== */
@@ -393,6 +395,8 @@ table 'MEDIDAS BASE'
 			    width: 100%;
 			    box-sizing: border-box;
 			    font-family: 'Segoe UI', sans-serif;
+			    border: 2px solid rgba(77,254,216,0.25);
+			    box-shadow: 0;
 			}
 			
 			/* ===== TABLA ===== */
@@ -520,14 +524,14 @@ table 'MEDIDAS BASE'
 			    .gauge-container {
 			        width: 100%;
 			        max-width: 520px;
-			        height: 320px; /* Igualamos el alto */
+			        height: 345px; /* Igualamos el alto */
 			        background: #0d121a;
 			        border-radius: 18px;
 			        padding: 20px;
 			        color: #ffffff;
 			        font-family: 'Segoe UI', sans-serif;
-			        border: 1px solid rgba(77,254,216,0.25);
-			        box-shadow: 0 0 40px rgba(77,254,216,0.15);
+			        border: 2px solid rgba(77,254,216,0.25);
+			        box-shadow: 0;
 			        display: flex;
 			        flex-direction: column;
 			        justify-content: space-between;
@@ -747,7 +751,541 @@ table 'MEDIDAS BASE'
 			```
 		lineageTag: 6d738496-2cd1-4f27-a2ee-3ef0e74ee36f
 
-	measure 'Sales Trend HTML2' = ```
+	measure 'Sales Trend HTML2' =
+			
+			-- ===============================
+			-- 1. QUARTERLY VALUES
+			-- ===============================
+			VAR V24_Q1 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 1")
+			    )
+			VAR V24_Q2 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 2")
+			    )
+			VAR V24_Q3 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 3")
+			    )
+			VAR V24_Q4 =
+			    CALCULATE(
+			        [Ventas 2024],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 4")
+			    )
+			
+			VAR V25_Q1 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 1")
+			    )
+			VAR V25_Q2 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 2")
+			    )
+			VAR V25_Q3 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 3")
+			    )
+			VAR V25_Q4 =
+			    CALCULATE(
+			        [Ventas 2025],
+			        FILTER(ALL('DIM_TIEMPO'), 'DIM_TIEMPO'[fecha].[Trimestre] = "Qtr 4")
+			    )
+			
+			-- ===============================
+			-- 2. MAX SCALE
+			-- ===============================
+			VAR MaxSales =
+			    MAXX(
+			        {
+			            V24_Q1, V24_Q2, V24_Q3, V24_Q4,
+			            V25_Q1, V25_Q2, V25_Q3, V25_Q4
+			        },
+			        [Value]
+			    ) * 1.15
+			
+			VAR MaxSafe = IF(ISBLANK(MaxSales) || MaxSales = 0, 1, MaxSales)
+			
+			-- Y axis values
+			VAR Y100 = MaxSafe
+			VAR Y75  = MaxSafe * 0.75
+			VAR Y50  = MaxSafe * 0.5
+			VAR Y25  = MaxSafe * 0.25
+			
+			-- ===============================
+			-- 3. SVG Y POSITIONS
+			-- ===============================
+			VAR Y24_Q1 = 150 - DIVIDE(V24_Q1, MaxSafe) * 150
+			VAR Y24_Q2 = 150 - DIVIDE(V24_Q2, MaxSafe) * 150
+			VAR Y24_Q3 = 150 - DIVIDE(V24_Q3, MaxSafe) * 150
+			VAR Y24_Q4 = 150 - DIVIDE(V24_Q4, MaxSafe) * 150
+			
+			VAR Y25_Q1 = 150 - DIVIDE(V25_Q1, MaxSafe) * 150
+			VAR Y25_Q2 = 150 - DIVIDE(V25_Q2, MaxSafe) * 150
+			VAR Y25_Q3 = 150 - DIVIDE(V25_Q3, MaxSafe) * 150
+			VAR Y25_Q4 = 150 - DIVIDE(V25_Q4, MaxSafe) * 150
+			
+			-- ===============================
+			-- 4. FORMAT Y LABELS
+			-- ===============================
+			VAR F100 = FORMAT(Y100, "$#,0,,.##M", "en-US")
+			VAR F75  = FORMAT(Y75,  "$#,0,,.##M", "en-US")
+			VAR F50  = FORMAT(Y50,  "$#,0,,.##M", "en-US")
+			VAR F25  = FORMAT(Y25,  "$#,0,,.##M", "en-US")
+			
+			-- ===============================
+			-- 5. HTML + SVG
+			-- ===============================
+			RETURN
+			"
+			<div style='
+			    width:100%;
+			    min-width:520px;
+			    height:320px;
+			    background:#0d121a;
+			    border-radius:22px;
+			    padding:24px;
+			    box-sizing:border-box;
+			    font-family:Segoe UI, sans-serif;
+			    color:#ffffff;
+			    border:2px solid rgba(77,254,216,0.18);
+			    box-shadow:0
+			'>
+			
+			    <!-- HEADER -->
+			    <div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:18px'>
+			        <div style='font-size:13px;color:#9fb2c7;text-transform:uppercase;letter-spacing:1.4px;font-weight:600'>
+			            Annual Sales (YoY)
+			        </div>
+			        <div style='font-size:11px;display:flex;gap:14px'>
+			            <span><span style='color:#5b8fd9;font-size:14px'>●</span> 2024</span>
+			            <span><span style='color:#4ec9e0;font-size:14px'>●</span> 2025</span>
+			        </div>
+			    </div>
+			
+			    <!-- CHART CONTAINER -->
+			    <div style='display:flex'>
+			
+			        <!-- Y AXIS -->
+			        <div style='width:60px;min-width:60px;font-size:10px;color:#8fa3b8;display:flex;flex-direction:column;justify-content:space-between;padding-right:10px;text-align:right;height:170px'>
+			            <span>" & F100 & "</span>
+			            <span>" & F75 & "</span>
+			            <span>" & F50 & "</span>
+			            <span>" & F25 & "</span>
+			        </div>
+			
+			        <!-- CHART -->
+			        <div style='flex:1;min-width:0'>
+			            <svg viewBox='0 0 400 150' preserveAspectRatio='none' style='width:100%;height:170px'>
+			
+			                <defs>
+			                    <linearGradient id='g24' x1='0' y1='0' x2='0' y2='1'>
+			                        <stop offset='0%' stop-color='#5b8fd9' stop-opacity='0.22'/>
+			                        <stop offset='100%' stop-color='#5b8fd9' stop-opacity='0'/>
+			                    </linearGradient>
+			                    <linearGradient id='g25' x1='0' y1='0' x2='0' y2='1'>
+			                        <stop offset='0%' stop-color='#4ec9e0' stop-opacity='0.25'/>
+			                        <stop offset='100%' stop-color='#4ec9e0' stop-opacity='0'/>
+			                    </linearGradient>
+			                </defs>
+			
+			                <!-- GRID -->
+			                <line x1='0' y1='37.5' x2='400' y2='37.5' stroke='rgba(255,255,255,0.04)'/>
+			                <line x1='0' y1='75' x2='400' y2='75' stroke='rgba(255,255,255,0.04)'/>
+			                <line x1='0' y1='112.5' x2='400' y2='112.5' stroke='rgba(255,255,255,0.04)'/>
+			                <line x1='0' y1='150' x2='400' y2='150' stroke='rgba(255,255,255,0.06)'/>
+			
+			                <!-- 2024 AREA -->
+			                <path d='M 0,150
+			                         L 0," & FORMAT(Y24_Q1,"0.00","en-US") & "
+			                         L 133," & FORMAT(Y24_Q2,"0.00","en-US") & "
+			                         L 266," & FORMAT(Y24_Q3,"0.00","en-US") & "
+			                         L 400," & FORMAT(Y24_Q4,"0.00","en-US") & "
+			                         L 400,150 Z'
+			                      fill='url(#g24)' />
+			
+			                <!-- 2024 LINE -->
+			                <path d='M 0," & FORMAT(Y24_Q1,"0.00","en-US") &
+			                         " L 133," & FORMAT(Y24_Q2,"0.00","en-US") &
+			                         " L 266," & FORMAT(Y24_Q3,"0.00","en-US") &
+			                         " L 400," & FORMAT(Y24_Q4,"0.00","en-US") & "'
+			                      fill='none'
+			                      stroke='#5b8fd9'
+			                      stroke-width='2.6'
+			                      stroke-linecap='round'
+			                      stroke-linejoin='round'/>
+			
+			                <!-- 2025 AREA -->
+			                <path d='M 0,150
+			                         L 0," & FORMAT(Y25_Q1,"0.00","en-US") & "
+			                         L 133," & FORMAT(Y25_Q2,"0.00","en-US") & "
+			                         L 266," & FORMAT(Y25_Q3,"0.00","en-US") & "
+			                         L 400," & FORMAT(Y25_Q4,"0.00","en-US") & "
+			                         L 400,150 Z'
+			                      fill='url(#g25)' />
+			
+			                <!-- 2025 LINE -->
+			                <path d='M 0," & FORMAT(Y25_Q1,"0.00","en-US") &
+			                         " L 133," & FORMAT(Y25_Q2,"0.00","en-US") &
+			                         " L 266," & FORMAT(Y25_Q3,"0.00","en-US") &
+			                         " L 400," & FORMAT(Y25_Q4,"0.00","en-US") & "'
+			                      fill='none'
+			                      stroke='#4ec9e0'
+			                      stroke-width='2.6'
+			                      stroke-linecap='round'
+			                      stroke-linejoin='round'/>
+			
+			            </svg>
+			        </div>
+			
+			    </div>
+			
+			    <!-- FOOTER -->
+			    <div style='display:flex;justify-content:space-between;margin-top:14px;font-size:10px;color:#8fa3b8;font-weight:700;letter-spacing:1px;padding-left:70px'>
+			        <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
+			    </div>
+			</div>
+			"
+		lineageTag: 6cd95bd0-5903-44b5-896c-3e4c5dfbffc5
+
+	measure 'Operational KPIs HTML' = ```
+			
+			"
+			<div style='
+			    background:#0d121a;
+			    border-radius:18px;
+			    padding:26px 28px;
+			    font-family:Segoe UI, sans-serif;
+			    color:#ffffff;
+			    width:100%;
+			    max-width:520px;
+			    height:320px;
+			    box-sizing:border-box;
+			    display:flex;
+			    flex-direction:column;
+			    justify-content:space-between;
+			'>
+			
+			
+			<!-- TITLE -->
+			<div style='
+			    font-size:12px;
+			    text-transform:uppercase;
+			    letter-spacing:1.2px;
+			    color:#9fb2c7;
+			    font-weight:600;
+			    margin-bottom:14px;
+			'>
+			Operational Metrics
+			</div>
+			
+			<!-- GRID -->
+			<div style='
+			    display:grid;
+			    grid-template-columns:1fr 1fr;
+			    row-gap:14px;
+			    column-gap:20px;
+			'>
+			
+			<!-- KPI -->
+			<div>
+			    <div style='font-size:11px;color:#8fa3b8'>Ticket Promedio</div>
+			    <div style='font-size:16px;font-weight:700'>
+			        " & FORMAT([Ticket Promedio], "$#,##0") & "
+			    </div>
+			</div>
+			
+			<div>
+			    <div style='font-size:11px;color:#8fa3b8'>Unidades por Pedido</div>
+			    <div style='font-size:16px;font-weight:700'>
+			        " & FORMAT([Unidades por Pedido], "0.0") & "
+			    </div>
+			</div>
+			
+			<div>
+			    <div style='font-size:11px;color:#8fa3b8'>Tasa de Facturación</div>
+			    <div style='font-size:16px;font-weight:700;color:#4ec9e0'>
+			        " & FORMAT([Tasa de Facturación], "0.0%") & "
+			    </div>
+			</div>
+			
+			<div>
+			    <div style='font-size:11px;color:#8fa3b8'>Ventas Promedio Mensual</div>
+			    <div style='font-size:16px;font-weight:700'>
+			        " & FORMAT([Ventas Promedio Mensual], "$#,##0") & "
+			    </div>
+			</div>
+			
+			<div>
+			    <div style='font-size:11px;color:#8fa3b8'>Pedidos Pendientes</div>
+			    <div style='font-size:16px;font-weight:700;color:#f5b97f'>
+			        " & FORMAT([Pedidos Pendientes], "#,##0") & "
+			    </div>
+			</div>
+			
+			<div>
+			    <div style='font-size:11px;color:#8fa3b8'>Pedidos Facturados</div>
+			    <div style='font-size:16px;font-weight:700;color:#4dfed8'>
+			        " & FORMAT([Pedidos Facturados], "#,##0") & "
+			    </div>
+			</div>
+			
+			</div>
+			</div>
+			"
+			
+			```
+		lineageTag: ac38e6c4-0eba-4a5b-b3e2-8d595e0c1981
+
+	measure 'Operational KPIs HTML2' = ```
+			
+			"
+			<style>
+			.op-card {
+			    max-width: 520px;
+			    min-width: 360px;
+			    height: 250px;
+			    background: #0d121a;
+			    border-radius: 18px;
+			    padding: 26px 28px;
+			    font-family: 'Segoe UI', sans-serif;
+			    color: #ffffff;
+			    box-sizing: border-box;
+			    border: 2px solid rgba(77,254,216,0.25);
+			    box-shadow: 0;
+			}
+			
+			/* TITLE */
+			.op-title {
+			    font-size: 12px;
+			    text-transform: uppercase;
+			    letter-spacing: 1.2px;
+			    color: #9fb2c7;
+			    font-weight: 600;
+			    margin-bottom: 18px;
+			}
+			
+			/* GRID */
+			.op-grid {
+			    display: grid;
+			    grid-template-columns: 1fr 1fr;
+			    row-gap: 20px;
+			    column-gap: 26px;
+			}
+			
+			/* LABEL */
+			.op-item {
+			    font-size: 11px;
+			    color: #8fa3b8;
+			}
+			
+			/* VALUE */
+			.op-value {
+			    display: block;
+			    margin-top: 4px;
+			    font-size: 18px;
+			    font-weight: 700;
+			    color: #ffffff;
+			}
+			
+			/* SEMANTIC COLORS (MISMO QUE TU CARD ORIGINAL) */
+			.op-info {
+			    color: #4ec9e0;   /* Tasa / info */
+			}
+			
+			.op-warning {
+			    color: #f5b97f;   /* Pendientes */
+			}
+			
+			.op-success {
+			    color: #4dfed8;   /* Completado */
+			}
+			</style>
+			
+			<div class='op-card'>
+			
+			    <div class='op-title'>Operational Metrics</div>
+			
+			    <div class='op-grid'>
+			
+			        <div class='op-item'>
+			            Ticket Promedio
+			            <span class='op-value'>
+			                " & FORMAT([Ticket Promedio], "$#,##0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Unidades por Pedido
+			            <span class='op-value'>
+			                " & FORMAT([Unidades por Pedido], "0.0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Tasa de Facturación
+			            <span class='op-value op-info'>
+			                " & FORMAT([Tasa de Facturación], "0.0%") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Ventas Promedio Mensual
+			            <span class='op-value'>
+			                " & FORMAT([Ventas Promedio Mensual], "$#,##0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Pedidos Pendientes
+			            <span class='op-value op-warning'>
+			                " & FORMAT([Pedidos Pendientes], "#,##0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Pedidos Facturados
+			            <span class='op-value op-success'>
+			                " & FORMAT([Pedidos Facturados], "#,##0") & "
+			            </span>
+			        </div>
+			
+			    </div>
+			
+			</div>
+			"
+			
+			```
+		lineageTag: 2ad57d9e-7e52-4095-8566-44938fb6167f
+
+	measure 'Seller KPIs HTML' = ```
+			
+			"
+			<style>
+			.op-card {
+			    max-width: 520px;
+			    min-width: 360px;
+			    height: 250px;
+			    background: #0d121a;
+			    border-radius: 18px;
+			    padding: 26px 28px;
+			    font-family: 'Segoe UI', sans-serif;
+			    color: #ffffff;
+			    box-sizing: border-box;
+			    border: 2px solid rgba(77,254,216,0.25);
+			    box-shadow: 0;
+			}
+			
+			/* TITLE */
+			.op-title {
+			    font-size: 12px;
+			    text-transform: uppercase;
+			    letter-spacing: 1.2px;
+			    color: #9fb2c7;
+			    font-weight: 600;
+			    margin-bottom: 18px;
+			}
+			
+			/* GRID */
+			.op-grid {
+			    display: grid;
+			    grid-template-columns: 1fr 1fr;
+			    row-gap: 20px;
+			    column-gap: 26px;
+			}
+			
+			/* LABEL */
+			.op-item {
+			    font-size: 11px;
+			    color: #8fa3b8;
+			}
+			
+			/* VALUE */
+			.op-value {
+			    display: block;
+			    margin-top: 4px;
+			    font-size: 18px;
+			    font-weight: 700;
+			    color: #ffffff;
+			}
+			
+			/* SEMANTIC COLORS */
+			.op-info {
+			    color: #4ec9e0;   /* Frecuencia / ritmo */
+			}
+			
+			.op-warning {
+			    color: #f5b97f;   /* Pendientes */
+			}
+			
+			.op-success {
+			    color: #4dfed8;   /* Performance positivo */
+			}
+			</style>
+			
+			<div class='op-card'>
+			
+			    <div class='op-title'>Seller Performance</div>
+			
+			    <div class='op-grid'>
+			
+			        <div class='op-item'>
+			            Frecuencia Cliente Vendedor
+			            <span class='op-value op-info'>
+			                " & FORMAT([Frecuencia Cliente Vendedor], "0.00") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Pedidos Pendientes Vendedor
+			            <span class='op-value op-warning'>
+			                " & FORMAT([Pedidos Pendientes Vendedor], "#,##0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Pedidos por Día Vendedor
+			            <span class='op-value op-info'>
+			                " & FORMAT([Pedidos por Día Vendedor], "0.0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Pedidos por Vendedor
+			            <span class='op-value'>
+			                " & FORMAT([Pedidos por Vendedor], "#,##0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Top Marcas por Vendedor
+			            <span class='op-value'>
+			                " & FORMAT([Top Marcas por Vendedor], "#,##0") & "
+			            </span>
+			        </div>
+			
+			        <div class='op-item'>
+			            Unidades por Pedido Vendedor
+			            <span class='op-value op-success'>
+			                " & FORMAT([Unidades por Pedido Vendedor], "0.0") & "
+			            </span>
+			        </div>
+			
+			    </div>
+			
+			</div>
+			"
+			
+			```
+		lineageTag: d262d5d0-b60e-48a2-b660-13edc7570e3a
+
+	measure 'Sales Trend HTML3' =
 			
 			-- ===============================
 			-- 1. QUARTERLY VALUES
@@ -805,17 +1343,21 @@ table 'MEDIDAS BASE'
 			
 			RETURN
 			"
+			
 			<div style='
 			    width:100%;
 			    max-width:540px;
 			    height:300px;
 			    background:#0d121a;
 			    border-radius:22px;
+			    border: 2px solid rgba(77,254,216,0.25);
+			    box-shadow: 0;
 			    padding:22px;
 			    box-sizing:border-box;
 			    font-family:Segoe UI, sans-serif;
 			    color:#ffffff;
 			'>
+			
 			
 			<div style='display:flex;justify-content:space-between;margin-bottom:16px'>
 			    <div style='font-size:13px;color:#9fb2c7;text-transform:uppercase;letter-spacing:1.4px;font-weight:600'>
@@ -830,7 +1372,7 @@ table 'MEDIDAS BASE'
 			<div style='display:flex'>
 			
 			<!-- Y AXIS -->
-			<div style='width:50px;font-size:10px;color:#8fa3b8;display:flex;flex-direction:column;justify-content:space-between;padding-right:6px'>
+			<div style='width:60px;font-size:10px;color:#8fa3b8;display:flex;flex-direction:column;justify-content:space-between;padding-right:10px;text-align:right'>
 			    <span>" & F100 & "</span>
 			    <span>" & F75 & "</span>
 			    <span>" & F50 & "</span>
@@ -862,16 +1404,13 @@ table 'MEDIDAS BASE'
 			</svg>
 			</div>
 			
-			<div style='display:flex;justify-content:space-between;margin-top:10px;font-size:10px;color:#8fa3b8;font-weight:700'>
+			<div style='display:flex;justify-content:space-between;margin-top:10px;font-size:10px;color:#8fa3b8;font-weight:700;padding-left:70px'>
 			    <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
 			</div>
 			
 			</div>
 			"
-			
-			
-			```
-		lineageTag: 6cd95bd0-5903-44b5-896c-3e4c5dfbffc5
+		lineageTag: 551f78c3-efb0-49d7-b147-7fceb6ea522e
 
 	column Dummy
 		formatString: 0

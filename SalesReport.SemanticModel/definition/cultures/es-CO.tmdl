@@ -2114,16 +2114,6 @@ cultureInfo es-CO
 			          "ventas totales": {
 			            "State": "Generated"
 			          }
-			        },
-			        {
-			          "Total Revenue": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
 			        }
 			      ]
 			    },
@@ -2160,16 +2150,6 @@ cultureInfo es-CO
 			            },
 			            "Weight": 0.727
 			          }
-			        },
-			        {
-			          "Total Orders": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
 			        }
 			      ]
 			    },
@@ -2201,16 +2181,6 @@ cultureInfo es-CO
 			        {
 			          "clientes únicos": {
 			            "State": "Generated"
-			          }
-			        },
-			        {
-			          "Total Clients": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
 			          }
 			        }
 			      ]
@@ -2260,16 +2230,6 @@ cultureInfo es-CO
 			          "ventas 2025": {
 			            "State": "Generated"
 			          }
-			        },
-			        {
-			          "Sales 2025": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
 			        }
 			      ]
 			    },
@@ -2285,16 +2245,6 @@ cultureInfo es-CO
 			        {
 			          "ventas 2024": {
 			            "State": "Generated"
-			          }
-			        },
-			        {
-			          "Sales 2024": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
 			          }
 			        }
 			      ]
@@ -3489,16 +3439,6 @@ cultureInfo es-CO
 			              "Agent": "Thesaurus"
 			            },
 			            "Weight": 0.591
-			          }
-			        },
-			        {
-			          "Variation % Sales": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
 			          }
 			        }
 			      ]
