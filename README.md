@@ -14,7 +14,7 @@ The goal of this project is to analyze sales performance in the Cali region, ide
 * **Power BI**: Data modeling, DAX measures, and interactive visualization.
 * **Git/GitHub**: Version control and project documentation.
 
-## 💡 Key Insights (Examples)
+## 💡 Key Insights
 * **Trend:** Sales showed a 26% increase in 2025 compared to previous year.
 * **Performance:** Product Category Vega represents 44% of total revenue.
 * **Geography:** The Cali shows the highest customer density with 46% and Palmira shows 23% of the Total Sales in both  years.
