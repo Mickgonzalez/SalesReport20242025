@@ -20,7 +20,7 @@ The goal of this project is to analyze sales performance in the Cali region, ide
 * **Performance:** Product Category Vega represents 44% of total revenue.
 * **Geography:** The Cali shows the highest customer density with 46% and Palmira shows 23% of the Total Sales in both  years.
 
-![alt text](image.png)
+![alt text](image-1.png)
 
 ## 🚀 How to View the Report
 1. Clone this repository or download the ZIP file.
