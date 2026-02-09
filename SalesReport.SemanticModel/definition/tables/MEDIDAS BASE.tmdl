@@ -847,7 +847,7 @@ table 'MEDIDAS BASE'
 			<div style='
 			    width:100%;
 			    min-width:520px;
-			    height:320px;
+			    height:310px;
 			    background:#0d121a;
 			    border-radius:22px;
 			    padding:24px;
@@ -1411,6 +1411,529 @@ table 'MEDIDAS BASE'
 			</div>
 			"
 		lineageTag: 551f78c3-efb0-49d7-b147-7fceb6ea522e
+
+	measure 'HTML Ventas por Segmento' = ```
+			
+			VAR Tabla =
+			    ADDCOLUMNS (
+			        VALUES ( DIM_SEGMENTACION[nombre_segmentacion] ),
+			        "Ventas", [Ventas Totales]
+			    )
+			
+			VAR MaxVentas =
+			    MAXX ( Tabla, [Ventas] )
+			
+			RETURN
+			"
+			<style>
+			
+			/* ===== CONTENEDOR GENERAL ===== */
+			.html-wrapper {
+			    background: #0d121a;
+			    padding: 18px;
+			    border-radius: 16px;
+			    width: 100%;
+			    box-sizing: border-box;
+			    font-family: 'Segoe UI', sans-serif;
+			    border: 2px solid rgba(77,254,216,0.25);
+			}
+			
+			/* ===== TABLA ===== */
+			.exec-table {
+			    width: 100%;
+			    border-collapse: collapse;
+			    color: #ffffff;
+			}
+			
+			.exec-table th {
+			    font-size: 11px;
+			    text-transform: uppercase;
+			    letter-spacing: 0.8px;
+			    color: #8fa3b8;
+			    text-align: left;
+			    padding: 8px 6px;
+			
+			    position: sticky;
+			    top: 0;
+			    z-index: 2;
+			
+			    background: #0d121a;
+			    border-bottom: 1px solid rgba(255,255,255,0.25);
+			}
+			
+			.exec-table td {
+			    padding: 8px 6px;
+			    font-size: 13px;
+			    border-bottom: 1px solid rgba(255,255,255,0.06);
+			    vertical-align: middle;
+			}
+			
+			/* ===== NUMEROS ===== */
+			.num {
+			    text-align: right;
+			    white-space: nowrap;
+			    font-weight: 600;
+			    color: #4dfed8;
+			}
+			
+			/* ===== BARRA ===== */
+			.bar-wrap {
+			    background: rgba(255,255,255,0.08);
+			    border-radius: 6px;
+			    height: 8px;
+			    overflow: hidden;
+			}
+			
+			.bar {
+			    height: 100%;
+			    background: linear-gradient(90deg, #4dfed8, #67a8ff);
+			}
+			
+			/* ===== HOVER ===== */
+			.exec-table tr:hover td {
+			    background: rgba(255,255,255,0.03);
+			}
+			
+			</style>
+			
+			<div class='html-wrapper'>
+			<table class='exec-table'>
+			    <tr>
+			        <th>Segmento</th>
+			        <th class='num'>Ventas</th>
+			        <th style='width:40%'>Distribución</th>
+			    </tr>
+			"
+			&
+			CONCATENATEX (
+			    Tabla,
+			    "
+			    <tr>
+			        <td>" & DIM_SEGMENTACION[nombre_segmentacion] & "</td>
+			
+			        <td class='num'>
+			            $" & FORMAT ( [Ventas], "#,##0" ) & "
+			        </td>
+			
+			        <td>
+			            <div class='bar-wrap'>
+			                <div class='bar' style='width:"
+			                    & FORMAT (
+			                        DIVIDE ( [Ventas], MaxVentas ) * 100,
+			                        "0.0",
+			                        "en-US"
+			                    )
+			                & "%'></div>
+			            </div>
+			        </td>
+			    </tr>
+			    ",
+			    "",
+			    [Ventas],
+			    DESC
+			)
+			&
+			"</table>
+			</div>"
+			
+			```
+		lineageTag: 37dde4bb-f9b1-48e9-b51a-48163dd91fa4
+
+	measure 'HTML Donut Ventas Top 5 Ciudad' = ```
+			
+			VAR BaseTabla =
+			    ADDCOLUMNS (
+			        VALUES ( DIM_CIUDAD[ciudad] ),
+			        "Ventas", [Ventas Totales]
+			    )
+			
+			VAR TablaTop5 =
+			    TOPN ( 5, BaseTabla, [Ventas], DESC )
+			
+			VAR VentasTop5 =
+			    SUMX ( TablaTop5, [Ventas] )
+			
+			VAR VentasTotal =
+			    SUMX ( BaseTabla, [Ventas] )
+			
+			VAR TablaFinal =
+			    UNION (
+			        TablaTop5,
+			        ROW (
+			            "ciudad", "Others",
+			            "Ventas", VentasTotal - VentasTop5
+			        )
+			    )
+			
+			VAR TablaPct =
+			    ADDCOLUMNS (
+			        TablaFinal,
+			        "Pct", DIVIDE ( [Ventas], VentasTotal )
+			    )
+			
+			VAR TablaOrdenada =
+			    ADDCOLUMNS (
+			        TablaPct,
+			        "RankPct", RANKX ( TablaPct, [Pct], , DESC )
+			    )
+			
+			VAR TablaColores =
+			    ADDCOLUMNS (
+			        TablaOrdenada,
+			        "Color",
+			        SWITCH (
+			            TRUE(),
+			            [ciudad] = "Others", "#3a3f4b",
+			            [RankPct] = 1, "#4dfed8",
+			            [RankPct] = 2, "#43e6c5",
+			            [RankPct] = 3, "#3bcfb2",
+			            [RankPct] = 4, "#33b89f",
+			            [RankPct] = 5, "#2aa18c",
+			            "#4dfed8"
+			        )
+			    )
+			
+			VAR DonutSize = 160
+			VAR Radius = 70
+			VAR Circumference = 2 * PI() * Radius
+			
+			VAR TablaOffset =
+			    ADDCOLUMNS (
+			        TablaColores,
+			        "Offset",
+			        SUMX (
+			            FILTER ( TablaColores, [RankPct] < EARLIER ( [RankPct] ) ),
+			            [Pct]
+			        )
+			    )
+			
+			RETURN
+			"
+			<style>
+			
+			.html-wrapper {
+			    background: #0d121a;
+			    padding: 18px;
+			    height:310px;
+			    border-radius: 16px;
+			    width: 100%;
+			    box-sizing: border-box;
+			    font-family: 'Segoe UI', sans-serif;
+			    border:2px solid rgba(77,254,216,0.18);
+			    box-shadow:0;
+			    display: flex;
+			    flex-direction: column;
+			}
+			
+			/* ===== TITLE ===== */
+			.chart-title {
+			    font-size: 13px;
+			    color: #9fb2c7;
+			    text-transform: uppercase;
+			    letter-spacing: 1.4px;
+			    font-weight: 600;
+			    margin-bottom: 12px;
+			}
+			
+			/* ===== CONTENT ===== */
+			.chart-body {
+			    display: flex;
+			    gap: 26px;
+			    align-items: center;
+			    flex: 1;
+			}
+			
+			/* ===== LEYENDA ===== */
+			.legend {
+			    display: flex;
+			    flex-direction: column;
+			    gap: 10px;
+			    font-size: 12px;
+			}
+			
+			.legend-item {
+			    display: flex;
+			    align-items: center;
+			    gap: 8px;
+			}
+			
+			.legend-color {
+			    width: 10px;
+			    height: 10px;
+			    border-radius: 50%;
+			}
+			
+			.legend-name {
+			    color: #8fa3b8;
+			}
+			
+			.legend-value {
+			    color: #ffffff;
+			    font-weight: 600;
+			}
+			
+			</style>
+			
+			<div class='html-wrapper'>
+			
+			<div class='chart-title'>Top 5 Cities by Total Sales</div>
+			
+			<div class='chart-body'>
+			
+			<svg width='" & DonutSize & "' height='" & DonutSize & "' viewBox='0 0 " & DonutSize & " " & DonutSize & "'>
+			    <g transform='rotate(-90 " & DonutSize/2 & " " & DonutSize/2 & ")'>
+			"
+			&
+			CONCATENATEX (
+			    TablaOffset,
+			    "
+			    <circle
+			        cx='" & DonutSize/2 & "'
+			        cy='" & DonutSize/2 & "'
+			        r='" & Radius & "'
+			        fill='none'
+			        stroke='" & [Color] & "'
+			        stroke-width='18'
+			        stroke-dasharray='"
+			            & FORMAT ( [Pct] * Circumference, "0.00", "en-US" ) & " "
+			            & FORMAT ( Circumference, "0.00", "en-US" ) & "'
+			        stroke-dashoffset='"
+			            & FORMAT ( -[Offset] * Circumference, "0.00", "en-US" ) & "'
+			    />
+			    ",
+			    "",
+			    [RankPct],
+			    ASC
+			)
+			&
+			"
+			    </g>
+			</svg>
+			
+			<div class='legend'>
+			"
+			&
+			CONCATENATEX (
+			    TablaColores,
+			    "
+			    <div class='legend-item'>
+			        <div class='legend-color' style='background:" & [Color] & "'></div>
+			        <div class='legend-name'>" & [ciudad] & "</div>
+			        <div class='legend-value'>" & FORMAT ( [Pct], "0.0%" ) & "</div>
+			    </div>
+			    ",
+			    "",
+			    [RankPct],
+			    ASC
+			)
+			&
+			"
+			</div>
+			
+			</div>
+			</div>
+			"
+			
+			```
+		lineageTag: 7e217c8f-b773-4283-a861-00a255d28e8f
+
+	measure 'HTML Donut Ventas Top 5 Departamento' = ```
+			
+			VAR BaseTabla =
+			    ADDCOLUMNS (
+			        VALUES ( DIM_CIUDAD[departamento] ),
+			        "Ventas", [Ventas Totales]
+			    )
+			
+			VAR TablaTop5 =
+			    TOPN ( 5, BaseTabla, [Ventas], DESC )
+			
+			VAR VentasTop5 =
+			    SUMX ( TablaTop5, [Ventas] )
+			
+			VAR VentasTotal =
+			    SUMX ( BaseTabla, [Ventas] )
+			
+			VAR TablaFinal =
+			    UNION (
+			        TablaTop5,
+			        ROW (
+			            "departamento", "Others",
+			            "Ventas", VentasTotal - VentasTop5
+			        )
+			    )
+			
+			VAR TablaPct =
+			    ADDCOLUMNS (
+			        TablaFinal,
+			        "Pct", DIVIDE ( [Ventas], VentasTotal )
+			    )
+			
+			VAR TablaOrdenada =
+			    ADDCOLUMNS (
+			        TablaPct,
+			        "RankPct", RANKX ( TablaPct, [Pct], , DESC )
+			    )
+			
+			VAR TablaColores =
+			    ADDCOLUMNS (
+			        TablaOrdenada,
+			        "Color",
+			        SWITCH (
+			            TRUE(),
+			            [departamento] = "Others", "#3a3f4b",
+			            [RankPct] = 1, "#4dfed8",
+			            [RankPct] = 2, "#43e6c5",
+			            [RankPct] = 3, "#3bcfb2",
+			            [RankPct] = 4, "#33b89f",
+			            [RankPct] = 5, "#2aa18c",
+			            "#4dfed8"
+			        )
+			    )
+			
+			VAR DonutSize = 160
+			VAR Radius = 70
+			VAR Circumference = 2 * PI() * Radius
+			
+			VAR TablaOffset =
+			    ADDCOLUMNS (
+			        TablaColores,
+			        "Offset",
+			        SUMX (
+			            FILTER ( TablaColores, [RankPct] < EARLIER ( [RankPct] ) ),
+			            [Pct]
+			        )
+			    )
+			
+			RETURN
+			"
+			<style>
+			
+			.html-wrapper {
+			    background: #0d121a;
+			    padding: 18px;
+			    height:310px;
+			    border-radius: 16px;
+			    width: 100%;
+			    box-sizing: border-box;
+			    font-family: 'Segoe UI', sans-serif;
+			    border:2px solid rgba(77,254,216,0.18);
+			    box-shadow:0;
+			    display: flex;
+			    flex-direction: column;
+			}
+			
+			/* ===== TITLE ===== */
+			.chart-title {
+			    font-size: 13px;
+			    color: #9fb2c7;
+			    text-transform: uppercase;
+			    letter-spacing: 1.4px;
+			    font-weight: 600;
+			    margin-bottom: 12px;
+			}
+			
+			/* ===== CONTENT ===== */
+			.chart-body {
+			    display: flex;
+			    gap: 26px;
+			    align-items: center;
+			    flex: 1;
+			}
+			
+			/* ===== LEGEND ===== */
+			.legend {
+			    display: flex;
+			    flex-direction: column;
+			    gap: 10px;
+			    font-size: 12px;
+			}
+			
+			.legend-item {
+			    display: flex;
+			    align-items: center;
+			    gap: 8px;
+			}
+			
+			.legend-color {
+			    width: 10px;
+			    height: 10px;
+			    border-radius: 50%;
+			}
+			
+			.legend-name {
+			    color: #8fa3b8;
+			}
+			
+			.legend-value {
+			    color: #ffffff;
+			    font-weight: 600;
+			}
+			
+			</style>
+			
+			<div class='html-wrapper'>
+			
+			<div class='chart-title'>Top 5 Departments by Total Sales</div>
+			
+			<div class='chart-body'>
+			
+			<svg width='" & DonutSize & "' height='" & DonutSize & "' viewBox='0 0 " & DonutSize & " " & DonutSize & "'>
+			    <g transform='rotate(-90 " & DonutSize/2 & " " & DonutSize/2 & ")'>
+			"
+			&
+			CONCATENATEX (
+			    TablaOffset,
+			    "
+			    <circle
+			        cx='" & DonutSize/2 & "'
+			        cy='" & DonutSize/2 & "'
+			        r='" & Radius & "'
+			        fill='none'
+			        stroke='" & [Color] & "'
+			        stroke-width='18'
+			        stroke-dasharray='"
+			            & FORMAT ( [Pct] * Circumference, "0.00", "en-US" ) & " "
+			            & FORMAT ( Circumference, "0.00", "en-US" ) & "'
+			        stroke-dashoffset='"
+			            & FORMAT ( -[Offset] * Circumference, "0.00", "en-US" ) & "'
+			    />
+			    ",
+			    "",
+			    [RankPct],
+			    ASC
+			)
+			&
+			"
+			    </g>
+			</svg>
+			
+			<div class='legend'>
+			"
+			&
+			CONCATENATEX (
+			    TablaColores,
+			    "
+			    <div class='legend-item'>
+			        <div class='legend-color' style='background:" & [Color] & "'></div>
+			        <div class='legend-name'>" & [departamento] & "</div>
+			        <div class='legend-value'>" & FORMAT ( [Pct], "0.0%" ) & "</div>
+			    </div>
+			    ",
+			    "",
+			    [RankPct],
+			    ASC
+			)
+			&
+			"
+			</div>
+			
+			</div>
+			</div>
+			"
+			
+			```
+		lineageTag: 4a665356-9163-40b8-90dd-09c78646e085
 
 	column Dummy
 		formatString: 0

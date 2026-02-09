@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
   "name": "63427f57592e7e883346",
   "position": {
-    "x": 1161.875,
-    "y": 272.5,
-    "z": 10000,
+    "x": 1231.4285714285716,
+    "y": 272.85714285714289,
+    "z": 9000,
     "height": 90,
-    "width": 386.875,
-    "tabOrder": 10000
+    "width": 397.85714285714289,
+    "tabOrder": 9000
   },
   "visual": {
     "visualType": "advancedSlicerVisual",
@@ -68,6 +68,13 @@
                             {
                               "Literal": {
                                 "Value": "'SARAH CONNOR'"
+                              }
+                            }
+                          ],
+                          [
+                            {
+                              "Literal": {
+                                "Value": "'MICHAEL CORLEONE'"
                               }
                             }
                           ]
@@ -226,6 +233,25 @@
           },
           "selector": {
             "id": "selection:selected"
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 0,
+                      "Percent": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "id": "default"
           }
         }
       ]

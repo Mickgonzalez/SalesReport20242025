@@ -2,15 +2,15 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
   "name": "58c91844279613107be1",
   "position": {
-    "x": 0,
-    "y": 522.19451371571074,
+    "x": 13.333333333333332,
+    "y": 176.66666666666666,
     "z": 6000,
-    "height": 155.61097256857855,
-    "width": 772.069825436409,
+    "height": 218.88888888888889,
+    "width": 714.44444444444446,
     "tabOrder": 6000
   },
   "visual": {
-    "visualType": "clusteredColumnChart",
+    "visualType": "donutChart",
     "query": {
       "queryState": {
         "Category": {

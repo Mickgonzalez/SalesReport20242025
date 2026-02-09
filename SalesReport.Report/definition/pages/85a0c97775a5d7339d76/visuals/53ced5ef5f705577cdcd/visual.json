@@ -1,13 +1,13 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.5.0/schema.json",
-  "name": "032568771ebbcf67c07c",
+  "name": "53ced5ef5f705577cdcd",
   "position": {
-    "x": 10.909090909090908,
-    "y": 7.2727272727272725,
-    "z": 1000,
-    "height": 355.45454545454544,
-    "width": 369.99999999999994,
-    "tabOrder": 7000
+    "x": 1225,
+    "y": 436.42857142857144,
+    "z": 11000,
+    "height": 436.42857142857144,
+    "width": 409.28571428571433,
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "htmlContent443BE3AD55E043BF878BED274D3A6855",
@@ -23,11 +23,11 @@
                       "Entity": "MEDIDAS BASE"
                     }
                   },
-                  "Property": "HTML CARD"
+                  "Property": "HTML Ventas por Segmento"
                 }
               },
-              "queryRef": "MEDIDAS BASE.HTML",
-              "nativeQueryRef": "HTML CARD"
+              "queryRef": "MEDIDAS BASE.HTML Clientes por Segmento",
+              "nativeQueryRef": "HTML Ventas por Segmento"
             }
           ]
         }
@@ -41,33 +41,6 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
-                }
-              }
-            },
-            "transparency": {
-              "expr": {
-                "Literal": {
-                  "Value": "100D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "border": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "radius": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
                 }
               }
             }
