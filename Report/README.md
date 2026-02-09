@@ -16,9 +16,9 @@ The goal of this project is to analyze sales performance in the Cali region, ide
 * **Git/GitHub**: Version control and project documentation.
 
 ## 💡 Key Insights (Examples)
-* **Trend:** Sales showed a 15% increase in Q4 2024 compared to previous quarters.
-* **Performance:** Product Category X represents 40% of total revenue.
-* **Geography:** The northern district of Cali shows the highest customer density.
+* **Trend:** Sales showed a 26% increase in 2025 compared to previous year.
+* **Performance:** Product Category Vega represents 44% of total revenue.
+* **Geography:** The Cali shows the highest customer density with 46% and Palmira shows 23% of the Total Sales in both  years.
 
 ![alt text](image.png)
 
