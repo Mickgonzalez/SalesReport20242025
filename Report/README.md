@@ -20,7 +20,7 @@ The goal of this project is to analyze sales performance in the Cali region, ide
 * **Performance:** Product Category X represents 40% of total revenue.
 * **Geography:** The northern district of Cali shows the highest customer density.
 
-![alt text](image-1.png)
+![alt text](image-3.png)
 
 ## 🚀 How to View the Report
 1. Clone this repository or download the ZIP file.
