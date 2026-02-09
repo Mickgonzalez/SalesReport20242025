@@ -8,7 +8,6 @@ The goal of this project is to analyze sales performance in the Cali region, ide
 ## 📂 Repository Structure
 * **Data/**: Contains the raw Excel data sources (`SalesData_Cali_2024_2025.xlsx`).
 * **Report/**: Contains the Power BI dashboard file (`SalesReport.pbix` and `SalesReport.pbip`).
-* **Images/**: (Optional) Screenshots of the dashboard for quick preview.
 
 ## 🛠️ Tools Used
 * **Microsoft Excel**: Data cleaning and preliminary analysis.
